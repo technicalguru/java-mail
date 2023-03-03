@@ -1,0 +1,47 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>eu.ralph-schuster</groupId>
+		<artifactId>pom-oss</artifactId>
+		<version>2.1.0</version>
+	</parent>
+
+	<properties>
+		<project.home>https://github.com/technicalguru/java-mail</project.home>
+		<maven.bundle.version>5.1.2</maven.bundle.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<artifactId>mail</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<url>https://github.com/technicalguru/java-mail</url>
+	<name>eu.ralph-schuster.mail</name>
+	<description>Sending e-mails with Java</description>
+
+	<scm>
+		<connection>scm:git:https://github.com/technicalguru/java-mail.git</connection>
+		<developerConnection>scm:git:https://github.com/technicalguru/java-mail.git</developerConnection>
+		<url>https://github.com/technicalguru/java-mail</url>
+		<tag>v1.0.0</tag>
+	</scm>
+
+	<issueManagement>
+		<system>GitHub</system>
+		<url>https://github.com/technicalguru/java-mail/issues</url>
+	</issueManagement>
+
+	<developers>
+		<developer>
+			<id>ralph</id>
+			<name>Ralph Schuster</name>
+		</developer>
+	</developers>
+
+	<modules>
+		<module>mail-templates</module>
+		<module>mail-queue</module>
+	</modules>
+
+</project>
