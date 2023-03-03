@@ -4,7 +4,7 @@ import org.simplejavamail.api.email.Email;
 import org.simplejavamail.api.mailer.Mailer;
 
 /**
- * Sends messages for SimpleJavaMail {@link Mail} objects.
+ * Sends messages for SimpleJavaMail {@link Email} objects.
  *    
  * @author ralph
  *

@@ -162,6 +162,7 @@ public class MailQueue<T> {
 	 *    the previous queue status.</p>
 	 * @param message - message to be sent
 	 * @param referenceId - reference id for the client
+	 * @param isPriority - when the mail shall be sent with priority
 	 * @param previousErrorCount - error count from previous attempts
 	 * @return {@code true} when the message was queued, {@code false} when it failed
 	 */
@@ -285,6 +286,7 @@ public class MailQueue<T> {
 	/**
 	 * Informs listeners that a message failed.
 	 * @param entry the message entry
+	 * @param reason the reson why sending failed
 	 */
 	protected void mailFailed(MessageEntry<T> entry, String reason) {
 		for (MailQueueListener listener : listeners) {
@@ -299,6 +301,7 @@ public class MailQueue<T> {
 	 * <li>The queue is empty and no more messages to be sent, or</li>
 	 * <li>The rate limit has been reached and we need to wait before sending</li>
 	 * </ul>
+	 * @throws Exception when the processing caused a severe faiulure
 	 */
 	public void run() throws Exception {
 		if (log.isDebugEnabled()) log.debug("I have "+size()+" messages queued");
@@ -398,6 +401,12 @@ public class MailQueue<T> {
 		protected int failedAttempts;
 		/** Whether it is priority */
 		protected boolean isPriority;
+		/**
+		 * Constructor.
+		 * @param referenceId reference ID of th emessage
+		 * @param message the message
+		 * @param isPriority whether it is prioritized
+		 */
 		public MessageEntry(String referenceId, X message, boolean isPriority) {
 			this.referenceId           = referenceId;
 			this.message               = message;

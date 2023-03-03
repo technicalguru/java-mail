@@ -23,6 +23,7 @@ public class MailQueueAdapter implements MailQueueListener {
 
 	/**
 	 * Constructor.
+	 * @param log - external logger to be used
 	 */
 	public MailQueueAdapter(Logger log) {
 		this.log = log != null ? log : LoggerFactory.getLogger(getClass());

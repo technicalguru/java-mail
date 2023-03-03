@@ -6,7 +6,7 @@ package rs.mail.queue;
 /**
  * A helper interface that actually will send e-mails.
  * 
- * <T> the type of email object this sender handles.
+ * @param <T> the type of email object this sender handles.
  * 
  * @author ralph
  *

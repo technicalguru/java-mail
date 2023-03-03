@@ -12,10 +12,10 @@
  * 
  * <pre>
  * // The traditional JavaMail way
- * MailQueue&lt;Mail&gt; queue1 = new MailQueue<>(new MessageMailSender());
+ * MailQueue&lt;Mail&gt; queue1 = new MailQueue&lt;&gt;(new MessageMailSender());
  * 
  * // The SimpleJavaMail way
- * MailQueue&lt;Email&gt; queue2 = new MailQueue<>(new SimpleJavaMailSender());
+ * MailQueue&lt;Email&gt; queue2 = new MailQueue&lt;&gt;(new SimpleJavaMailSender());
  * 
  * </pre>
  * 
