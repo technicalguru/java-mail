@@ -1,10 +1,13 @@
-# Java Mail Templates
-This project aims at creating e-mails from templates. The idea was created when dealing with a few
-applications that need different mail templates, with different languages and even different clients
-at the same time, using different content types (HTML and TEXT).
+# Java Mail Queue
 
-The project delivers a default implementation using [Freemarker](https://freemarker.apache.org) but
-has been designed openly to use other template engines if needed.
+This project provides a mail queue that is agnostic to the actual mail sending framework. The mail
+queue provides these features:
+
+- Queue capacity is limited (by default it is 1000)
+- Mails are processed in order of queuing
+- Mail sending can be throttled by a token bucket algorith (see Throttling)
+- Mails can be sent with priority (preceding mails in queue with normal priority)
+- Thread-safe implementation for mail queueing and sending.
 
 # Installation
 
@@ -13,144 +16,134 @@ Maven Coordinates:
 ```
 	<dependency>
 		<groupId>eu.ralph-schuster</groupId>
-		<artifactId>mail-templates</artifactId>
+		<artifactId>mail-queue</artifactId>
 		<version>1.0.0</version>
 	</dependency>
 ```
 
 # Documentation
 
-Javadoc is available from: [javadoc.io](https://www.javadoc.io/doc/eu.ralph-schuster/mail-templates)
+Javadoc is available from: [javadoc.io](https://www.javadoc.io/doc/eu.ralph-schuster/mail-queue)
 
 # Getting Started
 
-You need a `MessageBuilder` that you configure:
+The projects provides two sending implementations: 
+
+- traditional [JavaMail](https://javaee.github.io/javamail/) framework (`javax.mail.Mail`)
+- flexible [Simple Java Mail](https://www.simplejavamail.org/) framework
+
+You can setup your mail queue quite easily:
 
 ```
-MessageBuilder builder = MessageBuilderFactory.newBuilder()
-	.withResolver(new DefaultTemplateResolver(new File("/path-to-templates")))
-	.withSubjectTemplate("my-subject-template-name")
-	.withBodyTemplate("my-body-template-name")
-	.withMessageProducer(new DefaultMessageProducer(mailSession));
-```
+// The traditional JavaMail way
+MailQueue<Mail> queue1 = new MailQueue<>(new MessageMailSender());
 
-- The resolver is responsible to find and load your named templates. See Resolvers section below for 
-more information.
-- The subject and body templates define what templates will be used respectively. You can use names 
-  as above or set your `Template` objects directly. Latter is not recommended as it is hardcoded.
-- Finally, you need a `MessageProducer`. It is responsible to create a `Message` that
-  will be filled with the message body and the subject. Usually, this is a `MimeMessage`.
-  The default implementation can be used with an existing `javax.mail.Session` object
-  or a `Properties` object. 
-   
-Now you are ready to add named values to your `MessageBuilder`:
+// The SimpleJavaMail way
+MailQueue<Email> queue2 = new MailQueue<>(new SimpleJavaMailSender());
 
 ```
-builder.withValue('user', userObject);
-builder.withValue('product', productObject);
-```
 
-(Remember to follow the Freemarker rules for the [Data Model](https://freemarker.apache.org/docs/pgui_datamodel.html).)
-
-Once you have configured the builder, create the `Message`:
+Now you can start to queue mail objects. You pass the message and the reference ID
+which will being used to notify you about status changes of this message.
 
 ```
-Message email = builder.build();
+boolean success = queue.queue(message, referenceId);
 ```
 
-Set your TO, CC and BCC address fields and whatever other customization is required and send it.
+The method returns whether the message was queued successfully.
 
-## The Template Context
-The `Context` object holds most of the information that is required to build a message. Actually it 
-is the backing store for the `MessageBuilder`. So instead of above initialization code, you can also
-write:
+## Queue Capacity and Size
 
-```
-TemplateContext context = new TemplateContext();
-context.addResolver(new DefaultTemplateResolver(new File("/path-to-templates")));
-context.setSubjectTemplate("my-subject-template-name");
-context.setBodyTemplate("my-body-template-name");
+As the queue has a certain capacity, the `queue()` method will block when the
+capacity has been reached and return only when another message was sent meanwhile.
 
-MessageBuilder builder = MessageBuilderFactory.newBuilder()
-	.withContext(context)
-	.withMessageProducer(new DefaultMessageProducer(mailSession));
-	
-context.setValue('user', userObject);
-context.setValue('product', productObject);
-```
-
-## Different Languages
-The `Template` object is language-agnostic. It means it does not know anything
-about languages. That requires that individual templates are bound to specific languages.
-You will need a template for German and another one for English. However, you can provide
-the information about your requirement within the `TemplateContext` object:
+You can avoid the blocking by checking the remaining capacity of the queue in advance:
 
 ```
-context.setLocale(Locale.GERMANY);
+int remainingCapacity = remainingCapacity(false);
 ```
 
-It will be up for the resolvers to find your specific language template.
-
-## Resolvers
-The task of a `Resolver` is to deliver a `Template` object based on the name and the context. 
-You can implement your own resolvers but the default implementation `DefaultTemplateResolver` 
-should be sufficient for the most use cases. It will look for a file in a defined directory on your 
-system, taking into account the locale information within the context.
-
-We create the object with:
+or even simpler:
 
 ```
-TemplateResolver resolver = new DefaultTemplateResolver(new File('/my/template/directory'));
+if (queue.hasCapacity(false)) {
+	boolean success = queue.queue(message, referenceId);
+}
 ```
 
-Assumed that you defined `Locale.GERMANY` (`de-DE`), it will look for HTML and TEXT template files 
-when you ask for an template named `my-body-template`:
+The boolean parameter defines whether you want to check the priority queue (`true`) or not.
 
-1. `/my/template/directory/my-body-template.de-DE.html`
-1. `/my/template/directory/my-body-template.de.html`
-1. `/my/template/directory/my-body-template.html`
-
-TEXT template files are respectively searched for in this order: 
-1. `/my/template/directory/my-body-template.de-DE.txt`
-1. `/my/template/directory/my-body-template.de.txt`
-1. `/my/template/directory/my-body-template.txt`
-
-A `Template` should always provide HTML and TEXT templates. However, this is not required. The
-default builder implementation will derive one from the other as best as possible.
-
-## Resolver Priority
-Now, maybe you need to use a different template for specific clients. But the majority of
-your templates is the same. There is no need to copy all shared files. `MessageBuilder` 
-can use multiple `TemplateResolver` objects. If the first resolver cannot find the
-requested template, the second one is asked, then the third and so on. It is is only until
-the last resolver cannot find the template before the message building fails:
+The queue can give you a status of its current size (not capacity!):
 
 ```
-MessageBuilder builder = MessageBuilderFactory.newBuilder()
-	.withResolver(
-		new DefaultTemplateResolver(new File("/client-1-templates")),
-		new DefaultTemplateResolver(new File("/shared-templates")),
-	);
+int allMessages      = queue.size();
+int normalMessages   = queue.size(false);
+int priorityMessages = queue.size(true);
 ```
 
-Please note that resolvers cannot be changed once the message building started. You will
-need another `MessageBuilder` when you require different priorities.
+Please notice that you can control the capacity only when creating the queue. Once set
+it cannot be modified anymore.
 
-## Freemarker Templates
-The `FreemarkerMessageBuilder` provides all features of the Freemarker library. You
-can use directives, expressions, interpolations and include other templates. Especially latter
-will be found using the resolver process described above. This can be useful to extract
-shared template parts or use shared sub-templates.
+## Throttling
 
-The easiest way to include a sub-template is:
+The sending process can be throttled by using a token bucket. The `MailQueue` can be
+configured with an implementation of `Bucket` from the [Token Bucket](https://github.com/cowwoc/token-bucket)
+project:
 
 ```
-<#include "sub-template">
+Bucket bucket = ...
+queue.setTokenBucket(bucket);
 ```
 
-However, check whether the `<#import "sub-template>` is more suitable for you as the
-Freemarker documentation describes.
+Refer to the [Token Bucket](https://github.com/cowwoc/token-bucket) documentation for details about
+how to create such a bucket.
 
-Remember that each sub-template will be resolved from scratch, means it can be a more language
-specific template or a primary or fallback template regardless where the including template
-was loaded from.
+## Sending the Messages
+
+The `MailQueue` implementation makes no assumption about how you want to organize the
+sending process. The `run()` method will process the queue until it is empty or
+no token is available from the token bucket and return. It is up to the caller to re-call
+the method again to start processing the queue again.
+
+That said it is made clear that `run()` will never block when there is nothing to do at
+the given moment. It will simply return.
+
+You can start a separate thread in your application and run the method periodically.
+
+## Failed Message Sending
+
+Messages that cannot be sent due to some failure will be queued for a limited number of retries
+before giving up. You can fine-tune this process:
+
+```
+queue.setMaxRetries(5);
+queue.setRetryPeriod(3600000);
+```
+
+Default behaviour is to retry every 60 seconds and 3 times.
+
+## Listening to the MailQueue
+
+You can listen to any status change of messages by registering a `MailQueueListener`:
+
+```
+queue.addListener(new MailQueueAdapter() {
+	public void onSent(String referenceId) {
+		// Do something
+	}
+);
+```
+
+The reference ID is the ID of the message that was affected.
+
+`MailQueue` knows 4 states of a message:
+
+- QUEUED - the message was accepted to the queue
+- SENDING - the message was picked for sending and is currently being sent
+- SENT - the message has been sent successfully
+- FAILED - The message could not be sent.
+
+## Using your own Mailing Framework
+
+If you want to use your own mailing framework, you can write an implementation of the `MailSender`
+interface and pass an instance of it to the `MailQueue` constructor.

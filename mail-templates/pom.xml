@@ -16,7 +16,6 @@
 	</properties>
 
 	<artifactId>mail-templates</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>${project.groupId}.${project.artifactId}</name>
 	<description>Provide a framework for generating emails from templates</description>
