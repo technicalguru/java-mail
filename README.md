@@ -8,6 +8,8 @@ has been designed openly to use other template engines if needed.
 
 # Installation
 
+**Attention:** Due to a dependency you will need JDK 17 and above.
+
 Maven Coordinates:
 
 ```

@@ -108,7 +108,27 @@ the method again to start processing the queue again.
 That said it is made clear that `run()` will never block when there is nothing to do at
 the given moment. It will simply return.
 
-You can start a separate thread in your application and run the method periodically.
+You can start a separate thread in your application and run the method periodically. Here is
+an example of how to do it in Spring Boot:
+
+```
+	@Scheduled(fixedDelay = 10000)
+	protected void processQueue() {
+		MailQueue<Email> queue = getMailQueue();
+		if (queue != null) {
+			if (log.isDebugEnabled()) log.debug("Queue processing started");
+			try {
+				queue.run();
+			} catch (Throwable t) {
+				log.error("Queue processing failed.", t);
+			}
+			// Queue more emails from persistent store
+			checkForNonQueuedMessages();
+			if (log.isDebugEnabled()) log.debug("Queue processing finished");
+		}
+	}
+```
+
 
 ## Failed Message Sending
 
