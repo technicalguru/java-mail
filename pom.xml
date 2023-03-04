@@ -3,12 +3,12 @@
 	<parent>
 		<groupId>eu.ralph-schuster</groupId>
 		<artifactId>pom-oss</artifactId>
-		<version>2.1.0</version>
+		<version>2.2.0</version>
 	</parent>
 
 	<properties>
 		<project.home>https://github.com/technicalguru/java-mail</project.home>
-		<maven.bundle.version>5.1.2</maven.bundle.version>
+		<maven.bundle.version>5.1.8</maven.bundle.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
