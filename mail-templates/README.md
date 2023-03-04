@@ -10,6 +10,8 @@ has been designed openly to use other template engines if needed.
 
 Maven Coordinates:
 
+**Attention:** Due to a dependency you will need JDK 17 and above.
+
 ```
 	<dependency>
 		<groupId>eu.ralph-schuster</groupId>
