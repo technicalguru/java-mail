@@ -372,19 +372,20 @@ public class MailQueue<T> {
 	 * @return a message cleared to be sent
 	 */
 	protected MessageEntry<T> getNext() {
-		MessageEntry<T> rc = getNext(priorityQueue);
-		if (rc == null) rc = getNext(queue);
+		MessageEntry<T> rc = getNext(true);
+		if (rc == null) rc = getNext(false);
 		return rc;
 	}
 	
 	/**
 	 * Picks the next message from the given queue.
 	 * <p>The method does not yet remove the message from the queue.</p>
-	 * @param queue the queue to check
+	 * @param isPriority the queue to check (priority or normal)
 	 * @return a message cleared to be sent
 	 */
-	protected MessageEntry<T> getNext(BlockingQueue<MessageEntry<T>> queue) {
+	protected MessageEntry<T> getNext(boolean isPriority) {
 		long now = System.currentTimeMillis();
+		BlockingQueue<MessageEntry<T>> queue = isPriority ? this.priorityQueue : this.queue;
 		Object list[] = queue.toArray();
 		for (Object o : list) {
 			@SuppressWarnings("unchecked")
@@ -425,7 +426,7 @@ public class MailQueue<T> {
 	 * @author ralph
 	 *
 	 */
-	protected class MessageEntry<X> {
+	protected static class MessageEntry<X> {
 		/** Reference ID of the message */
 		protected String referenceId;
 		/** The message itself */
