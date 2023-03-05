@@ -54,24 +54,14 @@ The method returns whether the message was queued successfully.
 
 ## Queue Capacity and Size
 
-As the queue has a certain capacity, the `queue()` method will block when the
-capacity has been reached and return only when another message was sent meanwhile.
+As the queue has a certain capacity, the `queue()` method will return whether
+it was able to queue the given message..
 
-You can avoid the blocking by checking the remaining capacity of the queue in advance:
-
-```
-int remainingCapacity = remainingCapacity(false);
-```
-
-or even simpler:
+You can add some waiting time (in seconds) that the method shall wait before giving up:
 
 ```
-if (queue.hasCapacity(false)) {
-	boolean success = queue.queue(message, referenceId);
-}
+boolean success = queue.queue(message, referenceId, 10);
 ```
-
-The boolean parameter defines whether you want to check the priority queue (`true`) or not.
 
 The queue can give you a status of its current size (not capacity!):
 

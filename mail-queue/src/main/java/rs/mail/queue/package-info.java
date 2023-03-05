@@ -30,24 +30,14 @@
  * 
  * <h2>Queue Capacity and Size</h2>
  * 
- * <p>As the queue has a certain capacity, the {@code queue()} method will block when the
- * capacity has been reached and return only when another message was sent meanwhile.</p>
+ * <p>As the queue has a certain capacity, the {@code queue()} method will return whether
+ * it was able to queue the given message.</p>
  * 
- * <p>You can avoid the blocking by checking the remaining capacity of the queue in advance:</p>
- * 
- * <pre>
- * int remainingCapacity = remainingCapacity(false);
- * </pre>
- * 
- * <p>or even simpler:</p>
+ * <p>You can add some waiting time (in seconds) that the method shall wait before giving up:</p>
  * 
  * <pre>
- * if (queue.hasCapacity(false)) {
- * 	boolean success = queue.queue(message, referenceId);
- * }
+ * boolean success = queue.queue(message, referenceId, 10);
  * </pre>
- * 
- * <p>The boolean parameter defines whether you want to check the priority queue ({@code true}) or not.</p>
  * 
  * <p>The queue can give you a status of its current size (not capacity!):</p>
  * 
