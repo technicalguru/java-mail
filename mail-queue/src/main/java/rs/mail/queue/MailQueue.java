@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,8 @@ public class MailQueue<T> {
 	public static final int DEFAULT_MAX_RETRIES = 3;
 	/** Default period of time after a failed message will be tried again */
 	public static final long DEFAULT_RETRY_PERIOD = 60000;
+	/** The default period of time a queuing operation shall wait before giving up. */
+	public static final long DEFAULT_QUEUING_TIMEOUT_SECONDS = 10;
 	
 	private Logger log = LoggerFactory.getLogger(getClass());
 	
@@ -135,24 +138,65 @@ public class MailQueue<T> {
 	}
 
 	/**
+	 * Add the message to the queue for sending with normal priority.
+	 * <p>The message will be tried to be queued immediately without any blocking.</p>
+	 * @param message - message to be sent
+	 * @param referenceId - reference id for the client
+	 * @return {@code true} when the message was queued, {@code false} when it cannot be queued at this time
+	 */
+	public boolean queue(T message, String referenceId) {
+		return queue(message, referenceId, false, 0, 0);
+	}
+	
+	/**
 	 * Add the message to the queue for sending with normal priority. 
 	 * @param message - message to be sent
 	 * @param referenceId - reference id for the client
-	 * @return {@code true} when the message was queued, {@code false} when it failed
+	 * @param timeoutInSeconds the maximum waiting time to queue before giving up
+	 * @return {@code true} when the message was queued, {@code false} when it cannot be queued at this time
 	 */
-	public boolean queue(T message, String referenceId) {
-		return queue(message, referenceId, false);
+	public boolean queue(T message, String referenceId, long timeoutInSeconds) {
+		return queue(message, referenceId, false, 0, timeoutInSeconds);
 	}
 	
+	/**
+	 * Add the message to the queue for sending. 
+	 * <p>The message will be tried to be queued immediately without any blocking.</p>
+	 * @param message - message to be sent
+	 * @param referenceId - reference id for the client
+	 * @param isPriority - when the mail shall be sent with priority
+	 * @return {@code true} when the message was queued, {@code false} when it cannot be queued at this time
+	 */
+	public boolean queue(T message, String referenceId, boolean isPriority) {
+		return queue(message, referenceId, isPriority, 0, 0);
+	}
+
 	/**
 	 * Add the message to the queue for sending. 
 	 * @param message - message to be sent
 	 * @param referenceId - reference id for the client
 	 * @param isPriority - when the mail shall be sent with priority
-	 * @return {@code true} when the message was queued, {@code false} when it failed
+	 * @param timeoutInSeconds the maximum waiting time to queue before giving up
+	 * @return {@code true} when the message was queued, {@code false} when it cannot be queued at this time
 	 */
-	public boolean queue(T message, String referenceId, boolean isPriority) {
-		return queue(message, referenceId, isPriority, 0);
+	public boolean queue(T message, String referenceId, boolean isPriority, long timeoutInSeconds) {
+		return queue(message, referenceId, isPriority, 0, timeoutInSeconds);
+	}
+
+	/**
+	 * Add the message to the queue for sending.
+	 * <p>This method is intended to be used when you need you re-populate the queue after
+	 *    a system restart. You can pass the additional errorCount parameter to re-establish
+	 *    the previous queue status.</p>
+	 * <p>The message will be tried to be queued immediately without any blocking.</p>
+	 * @param message - message to be sent
+	 * @param referenceId - reference id for the client
+	 * @param isPriority - when the mail shall be sent with priority
+	 * @param previousErrorCount - error count from previous attempts
+	 * @return {@code true} when the message was queued, {@code false} when it cannot be queued at this time
+	 */
+	public boolean queue(T message, String referenceId, boolean isPriority, int previousErrorCount) {
+		return queue(message, referenceId, isPriority, previousErrorCount, 0);
 	}
 	
 	/**
@@ -164,21 +208,31 @@ public class MailQueue<T> {
 	 * @param referenceId - reference id for the client
 	 * @param isPriority - when the mail shall be sent with priority
 	 * @param previousErrorCount - error count from previous attempts
-	 * @return {@code true} when the message was queued, {@code false} when it failed
+	 * @param timeoutInSeconds the maximum waiting time to queue before giving up
+	 * @return {@code true} when the message was queued, {@code false} when it cannot be queued at this time
 	 */
-	public boolean queue(T message, String referenceId, boolean isPriority, int previousErrorCount) {
+	public boolean queue(T message, String referenceId, boolean isPriority, int previousErrorCount, long timeoutInSeconds) {
 		MessageEntry<T> entry = new MessageEntry<T>(referenceId, message, isPriority);
 		entry.failedAttempts = previousErrorCount;
+		return queue(entry, isPriority ? priorityQueue : queue, timeoutInSeconds);
+	}
+	
+	/**
+	 * Internal queuing implementation - queues the entry in th egiven queue using the given maximum waiting time.
+	 * @param message the message to be queued
+	 * @param queue the queue to be used
+	 * @param timeoutInSeconds the maximum waiting time to queue before giving up
+	 * @return {@code true} when the message was queued, {@code false} when it cannot be queued at this time
+	 */
+	protected boolean queue(MessageEntry<T> message, LinkedBlockingDeque<MessageEntry<T>> queue, long timeoutInSeconds) {
 		try {
-			if (isPriority) {
-				priorityQueue.put(entry);
+			if (timeoutInSeconds > 0) {
+				return queue.offer(message, timeoutInSeconds, TimeUnit.SECONDS);
 			} else {
-				queue.put(entry);
+				return queue.offer(message);
 			}
-			mailQueued(entry);
-			return true;
 		} catch (InterruptedException e) {
-			log.error("Queuing interrupted on "+referenceId, e);
+			log.error("Queuing interrupted on "+message.referenceId, e);
 		}
 		return false;
 	}
@@ -216,25 +270,6 @@ public class MailQueue<T> {
 	 */
 	public int remainingCapacity(boolean isPriority) {
 		return isPriority ? priorityQueue.remainingCapacity() : queue.remainingCapacity();
-	}
-	
-	/**
-	 * Returns whether the queue has still capacity for 1 message for the given type of mail
-	 * @param isPriority - whether normal of prioritized mails shall be checked
-	 * @return {@code true} when there is at least 1 queue seat available
-	 */
-	public boolean hasCapacity(boolean isPriority) {
-		return hasCapacity(isPriority, 1);
-	}
-	
-	/**
-	 * Returns whether the queue has still capacity for the given type of mail
-	 * @param isPriority - whether normal of prioritized mails shall be checked
-	 * @param required - number of required seats
-	 * @return {@code true} when there are at least required number of seats available
-	 */
-	public boolean hasCapacity(boolean isPriority, int required) {
-		return remainingCapacity(isPriority) >= required;
 	}
 	
 	/**
