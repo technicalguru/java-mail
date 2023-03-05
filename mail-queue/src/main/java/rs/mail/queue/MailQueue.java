@@ -226,11 +226,14 @@ public class MailQueue<T> {
 	 */
 	protected boolean queue(MessageEntry<T> message, LinkedBlockingDeque<MessageEntry<T>> queue, long timeoutInSeconds) {
 		try {
+			boolean rc = false;
 			if (timeoutInSeconds > 0) {
-				return queue.offer(message, timeoutInSeconds, TimeUnit.SECONDS);
+				rc = queue.offer(message, timeoutInSeconds, TimeUnit.SECONDS);
 			} else {
-				return queue.offer(message);
+				rc = queue.offer(message);
 			}
+			if (rc) mailQueued(message);
+			return rc;
 		} catch (InterruptedException e) {
 			log.error("Queuing interrupted on "+message.referenceId, e);
 		}
