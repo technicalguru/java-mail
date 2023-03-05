@@ -324,6 +324,40 @@ public class MailQueueTest {
 		assertEquals(0, queue.size(true));
 	}
 	
+	// Test listener notification with success
+	@Test
+	public void testSend_withSuccess_thenListenerNotified() throws Exception {
+		MailQueue<DummyMail> queue = createQueue(10, 5, false, null);
+		DummyMailQueueListener listener = new DummyMailQueueListener();
+		queue.addListener(listener);
+		boolean success = queue.queue(new DummyMail("Message26"), "Message26", true);
+		assertTrue(success);
+		queue.run();
+		assertNotNull(listener.queuedReferenceId);
+		assertEquals("Message26", listener.queuedReferenceId);
+		assertNotNull(listener.sendingReferenceId);
+		assertEquals("Message26", listener.sendingReferenceId);
+		assertNotNull(listener.sentReferenceId);
+		assertEquals("Message26", listener.sentReferenceId);
+	}
+	
+	// Test listener notification with failure
+	@Test
+	public void testSend_withFailed_thenListenerNotified() throws Exception {
+		MailQueue<DummyMail> queue = createQueue(10, 5, true, null);
+		DummyMailQueueListener listener = new DummyMailQueueListener();
+		queue.addListener(listener);
+		boolean success = queue.queue(new DummyMail("Message27"), "Message27", true);
+		assertTrue(success);
+		queue.run();
+		assertNotNull(listener.queuedReferenceId);
+		assertEquals("Message27", listener.queuedReferenceId);
+		assertNotNull(listener.sendingReferenceId);
+		assertEquals("Message27", listener.sendingReferenceId);
+		assertNotNull(listener.failedReferenceId);
+		assertEquals("Message27", listener.failedReferenceId);
+	}
+	
 	/**
 	 * Creates the queue for a test.
 	 * @param maxSize - size of queue
