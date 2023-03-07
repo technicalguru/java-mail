@@ -40,6 +40,12 @@
 			<groupId>com.github.cowwoc.token-bucket</groupId>
 			<artifactId>token-bucket</artifactId>
 			<version>6.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.simplejavamail</groupId>
