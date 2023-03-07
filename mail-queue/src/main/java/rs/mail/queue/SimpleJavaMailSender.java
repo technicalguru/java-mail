@@ -15,12 +15,28 @@ public class SimpleJavaMailSender implements MailSender<Email> {
 	
 	/**
 	 * Constructor.
+	 */
+	public SimpleJavaMailSender() {
+		this(null);
+	}
+	
+	/**
+	 * Constructor.
 	 * @param mailer - the mailer object from SimpleJavaMail
 	 */
 	public SimpleJavaMailSender(Mailer mailer) {
 		this.mailer        = mailer;
 	}
 	
+	/**
+	 * Sets the mailer.
+	 * @param mailer the mailer to set
+	 */
+	public void setMailer(Mailer mailer) {
+		this.mailer = mailer;
+	}
+
+
 	/**
 	 * Returns the mailer.
 	 * @return the mailer
@@ -34,7 +50,8 @@ public class SimpleJavaMailSender implements MailSender<Email> {
 	 */
 	@Override
 	public void sendMessage(Email message, String referenceId) throws Exception {
-		mailer.sendMail(message);
+		Mailer mailer = getMailer();
+		if (mailer != null) mailer.sendMail(message);
 	}
 
 	
