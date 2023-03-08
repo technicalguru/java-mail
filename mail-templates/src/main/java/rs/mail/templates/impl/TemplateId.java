@@ -27,6 +27,7 @@ public class TemplateId {
 	/**
 	 * Constructor.
 	 * @param id - the ID of the template.
+	 * @param locale - the locale of the template
 	 */
 	public TemplateId(String id, Locale locale) {
 		this.id     = id;

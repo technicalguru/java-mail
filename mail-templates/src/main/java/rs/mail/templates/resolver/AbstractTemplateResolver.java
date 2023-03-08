@@ -126,6 +126,7 @@ public abstract class AbstractTemplateResolver implements TemplateResolver {
 	 * @param name - the name of the object
 	 * @param context - the context
 	 * @return the template resolved or {@code null} if not available from this resolver.
+	 * @throws ResolverException when resolving the template fails
 	 */
 	protected abstract Template resolve(TemplateId id, String name, TemplateContext context) throws ResolverException;
 }

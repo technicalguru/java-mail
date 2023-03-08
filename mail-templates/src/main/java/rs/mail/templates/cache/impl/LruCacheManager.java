@@ -13,14 +13,30 @@ import java.util.Comparator;
  */
 public class LruCacheManager extends AbstractCacheManager {
 
+	/**
+	 * Constructor.
+	 * @see AbstractCacheManager#DEFAULT_CLEANUP_THRESHOLD
+	 * @see AbstractCacheManager#DEFAULT_MIN_SIZE_THRESHOLD
+	 * @see AbstractCacheManager#DEFAULT_CLEANUP_LAPSE
+	 */
 	public LruCacheManager() {
 		super();
 	}
 
+	/**
+	 * Constructor.
+	 * @param cleanupThreshold - size of cache that triggers a cleanup
+	 * @param minSizeThreshold - size of cache after cleanup
+	 * @param minCleanupLapse - time in ms between two cleanup tasks
+	 */
 	public LruCacheManager(int cleanupThreshold, int minSizeThreshold, long minCleanupLapse) {
 		super(cleanupThreshold, minSizeThreshold, minCleanupLapse);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	protected <K> Comparator<CacheEntryMeta<K>> getMetaComparator() {
 		return new Comparator<CacheEntryMeta<K>>() {
 			@Override

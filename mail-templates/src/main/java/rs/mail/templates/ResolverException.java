@@ -12,6 +12,7 @@ package rs.mail.templates;
 public class ResolverException extends Exception {
 
 	private static final long serialVersionUID = 1L;
+	/** The resolver that threw the exception */
 	private TemplateResolver resolver;
 	
 	/**

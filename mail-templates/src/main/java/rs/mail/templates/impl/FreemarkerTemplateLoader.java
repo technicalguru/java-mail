@@ -22,6 +22,10 @@ public class FreemarkerTemplateLoader implements TemplateLoader {
 	private ContentType              contentType;
 	private long                     lastModifiedCount = 0;
 	
+	/**
+	 * Constructor.
+	 * @param builder the message builder this loader belongs to.
+	 */
 	public FreemarkerTemplateLoader(FreemarkerMessageBuilder<?> builder) {
 		this.builder     = builder;
 		this.contentType = ContentType.HTML;

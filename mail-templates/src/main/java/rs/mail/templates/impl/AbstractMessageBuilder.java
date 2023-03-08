@@ -104,7 +104,9 @@ public abstract class AbstractMessageBuilder<T> implements MessageBuilder<T> {
 		return context;
 	}
 
-	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public T build() throws BuilderException {
 		try {
@@ -184,6 +186,7 @@ public abstract class AbstractMessageBuilder<T> implements MessageBuilder<T> {
 	/**
 	 * Build the subject of the message
 	 * @return the subject or {@code null} if no template available
+	 * @throws BuilderException when building the subject fails
 	 */
 	protected String buildSubject() throws BuilderException {
 		Template template = context.getSubjectTemplate();
@@ -192,8 +195,10 @@ public abstract class AbstractMessageBuilder<T> implements MessageBuilder<T> {
 	}
 	
 	/**
-	 * Build the subject of the message
+	 * Build the subject of the message.
+	 * @param contentType the content type of the build
 	 * @return the subject or {@code null} if no template available
+	 * @throws BuilderException when building the subject fails
 	 */
 	protected String buildBody(ContentType contentType) throws BuilderException {
 		Template template = context.getBodyTemplate();
@@ -205,6 +210,7 @@ public abstract class AbstractMessageBuilder<T> implements MessageBuilder<T> {
 	 * Resolves the name of the template.
 	 * @param name - name of template to find
 	 * @return the template or {@code null} if not found.
+	 * @throws ResolverException when resolving fails
 	 */
 	protected Template resolve(String name) throws ResolverException {
 		if (name != null) {

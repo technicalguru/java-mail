@@ -23,6 +23,8 @@ import rs.mail.templates.TemplateContext;
  * <p>It needs to be noted that caching is handled at {@link MessageBuilder} level
  *    not at FreeMarker level. That's why the caching for Freemarker is disabled.</p>
  *    
+ * @param <T> the type of the build result
+ * 
  * @author ralph
  *
  */
@@ -33,6 +35,7 @@ public class FreemarkerMessageBuilder<T> extends AbstractMessageBuilder<T> {
 	
 	/**
 	 * Constructor.
+	 * @param messageCreator the producer of the message implementation
 	 */
 	public FreemarkerMessageBuilder(MessageCreator<T> messageCreator) {
 		super(messageCreator);

@@ -20,6 +20,7 @@ import rs.mail.templates.cache.CacheManager;
  */
 public class DefaultCache<K, V> implements Cache<K, V> {
 
+	/** clock implementation for easier time access */
 	protected static Clock CLOCK = Clock.systemDefaultZone();
 	
 	private Map<K, V>    entries;
@@ -29,6 +30,10 @@ public class DefaultCache<K, V> implements Cache<K, V> {
 	private long         lastCleanupTime;
 	private long         minCleanupLapse;
 	
+	/**
+	 * Constructor.
+	 * @param cacheManager the cache manager implementation to be used
+	 */
 	public DefaultCache(CacheManager cacheManager) {
 		this.cacheManager     = cacheManager;
 		this.entries          = new HashMap<>();
@@ -167,12 +172,18 @@ public class DefaultCache<K, V> implements Cache<K, V> {
 		return meta;
 	}
 
+	/**
+	 * Internal cleanup method that performs the check on threshold and lapse times.
+	 */
 	protected void _cleanup() {
 		if ((size() > cleanupThreshold) && (CLOCK.millis() - lastCleanupTime > minCleanupLapse)) {
 			cleanup();
 		}
 	}
 	
+	/**
+	 * Performs a cleanup unconditionally.
+	 */
 	public void cleanup() {
 		synchronized (meta) {
 			cacheManager.cleanup(this, meta);

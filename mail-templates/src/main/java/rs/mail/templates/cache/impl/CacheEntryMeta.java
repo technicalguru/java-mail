@@ -2,6 +2,9 @@ package rs.mail.templates.cache.impl;
 
 /**
  * Class to hold cacheEntryMeta information.
+ * 
+ * @param <K> the key type of the cache
+ * 
  * @author ralph
  */
 public class CacheEntryMeta<K> {
@@ -11,6 +14,10 @@ public class CacheEntryMeta<K> {
 	private long useCounter;
 	private long lastUseTime;
 	
+	/**
+	 * Constructor.
+	 * @param key the key in the cache
+	 */
 	public CacheEntryMeta(K key) {
 		this.key          = key;
 		this.creationTime = DefaultCache.CLOCK.millis();

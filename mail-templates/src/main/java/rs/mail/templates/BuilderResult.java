@@ -17,16 +17,30 @@ public class BuilderResult {
 	private String subject;
 	private Map<ContentType,String> content;
 	
+	/**
+	 * Default constructor.
+	 */
 	public BuilderResult() {
 		this(null, null, null);
 	}
 	
+	/**
+	 * Constructor.
+	 * @param subject the result of building the subject string
+	 * @param textContent the result of building the text content
+	 * @param htmlContent the result of building the HTML content
+	 */
 	public BuilderResult(String subject, String textContent, String htmlContent) {
 		this(subject, null);
 		if (textContent != null) setContent(ContentType.TEXT, textContent);
 		if (htmlContent != null) setContent(ContentType.HTML, htmlContent);
 	}
 	
+	/**
+	 * COnstructor.
+	 * @param subject the result of building the subject string
+	 * @param content the results of building the various content types
+	 */
 	public BuilderResult(String subject, Map<ContentType,String> content) {
 		this.subject = subject;
 		this.content = content != null ? content : new HashMap<>();

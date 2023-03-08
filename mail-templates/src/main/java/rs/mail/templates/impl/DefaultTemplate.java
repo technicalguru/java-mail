@@ -127,6 +127,7 @@ public class DefaultTemplate implements Template {
 	 * Load the content for a content type from URL.
 	 * @param contentType - the content type
 	 * @param url - the URL to load from
+	 * @param charset - the charset to be used to load from the URL
 	 * @throws IOException when loading the template fails
 	 */
 	public void setContent(ContentType contentType, URL url, Charset charset) throws IOException {
@@ -138,6 +139,7 @@ public class DefaultTemplate implements Template {
 	 * Load the content for a content type from a {@link File}.
 	 * @param contentType - the content type
 	 * @param file - the file to load from
+	 * @param charset - the charset to be used to load from the file
 	 * @throws IOException when loading the template fails
 	 */
 	public void setContent(ContentType contentType, File file, Charset charset) throws IOException {
@@ -149,6 +151,7 @@ public class DefaultTemplate implements Template {
 	 * Load the content for a content type from an {@link InputStream}.
 	 * @param contentType - the content type
 	 * @param inputStream - the input stream to load from
+	 * @param charset - the charset to be used to load from the input stream
 	 * @throws IOException when loading the template fails
 	 */
 	public void setContent(ContentType contentType, InputStream inputStream, Charset charset) throws IOException {

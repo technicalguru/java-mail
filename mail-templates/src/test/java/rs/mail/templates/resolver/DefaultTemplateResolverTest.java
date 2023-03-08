@@ -186,10 +186,6 @@ public class DefaultTemplateResolverTest {
 		assertEquals(id2, template2.getId());
 		assertNotEquals(template1.getTemplate(ContentType.HTML), template2.getTemplate(ContentType.HTML));
 		assertNotEquals(template1.getTemplate(ContentType.TEXT), template2.getTemplate(ContentType.TEXT));
-		System.out.println("template3.de.html="+template1.getTemplate(ContentType.HTML));
-		System.out.println("template3.en.html="+template2.getTemplate(ContentType.HTML));
-		System.out.println("template3.de.txt="+template1.getTemplate(ContentType.TEXT));
-		System.out.println("template3.en.txt="+template2.getTemplate(ContentType.TEXT));
 	}
 	
 

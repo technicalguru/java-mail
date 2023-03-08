@@ -17,12 +17,26 @@ import javax.mail.internet.MimeMultipart;
  */
 public class MailUtils {
 
+	/**
+	 * Adds a {@link Multipart} to the message.
+	 * @param message the message object
+	 * @return the {@link Multipart} object
+	 * @throws MessagingException when the {@link Multipart} cannot be created
+	 */
 	public static Multipart addMultipart(Message message)  throws MessagingException {
 		Multipart rc = new MimeMultipart();
 		message.setContent(rc);
 		return rc;
 	}
 	
+	/**
+	 * Adds MIME part to the {@link Multipart} of the message.
+	 * @param multipart multipart object
+	 * @param content content of part
+	 * @param contentType type of content
+	 * @return the {@link MimeBodyPart} that was added
+	 * @throws MessagingException when adding the part failed
+	 */
 	public static MimeBodyPart addMimePart(Multipart multipart, String content, String contentType) throws MessagingException {
 		MimeBodyPart mimePart = new MimeBodyPart();
 		mimePart.setContent(content, contentType);

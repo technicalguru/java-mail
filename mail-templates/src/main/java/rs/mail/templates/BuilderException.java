@@ -12,6 +12,7 @@ package rs.mail.templates;
 public class BuilderException extends Exception {
 
 	private static final long serialVersionUID = 1L;
+	/** The builder that threw the exception */
 	private MessageBuilder<?> builder;
 	
 	/**
