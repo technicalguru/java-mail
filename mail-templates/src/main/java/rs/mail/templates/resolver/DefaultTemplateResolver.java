@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.io.IOUtils;
@@ -41,6 +43,8 @@ import rs.mail.templates.impl.TemplateId;
  * </ol>
  * <p>The prioritized list of paths can be changed by overrriding {@link #getPriorityPaths(String, TemplateContext, ContentType)}.</p>
  * 
+ * <p>Please notice that an additiona file {@code <directory>/my-template.ftl} will be returned when the name was {@code my-template.ftl}
+ *    (ends with {@code .ftl}). This allows an easier inclusion of general Freemarker libraries.</p>
  * @author ralph
  *
  */
@@ -199,14 +203,16 @@ public class DefaultTemplateResolver extends AbstractTemplateResolver {
 	 * @see #getFileVariants(TemplateContext)
 	 */
 	protected File[] getPriorityPaths(String name, TemplateContext context, ContentType contentType) {
-		String suffix     = ContentType.HTML.equals(contentType) ? ".html" : ".txt";
-		String variants[] = getFileVariants(context); 
-		File rc[] = new File[variants.length+1];
+		String suffix      = ContentType.HTML.equals(contentType) ? ".html" : ".txt";
+		boolean ftlLibrary = name.endsWith(".ftl");
+		String variants[]  = getFileVariants(context); 
+		List<File> files   = new ArrayList<>();
 		for (int i=0; i<variants.length; i++) {
-			rc[i] = new File(directory, name+"."+variants[i]+suffix);
+			files.add(new File(directory, name+"."+variants[i]+suffix));
 		}
-		rc[variants.length] = new File(directory, name+suffix);
-		return rc;
+		files.add(new File(directory, name+suffix));
+		if (ftlLibrary) files.add(new File(directory, name));
+		return files.toArray(new File[files.size()]);
 	}
 	
 	/**
