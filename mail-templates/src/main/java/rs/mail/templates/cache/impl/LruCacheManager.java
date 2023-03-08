@@ -6,6 +6,8 @@ package rs.mail.templates.cache.impl;
 import java.util.Comparator;
 
 /**
+ * Removes cache entries that were not used for longest time.
+ * 
  * @author ralph
  *
  */

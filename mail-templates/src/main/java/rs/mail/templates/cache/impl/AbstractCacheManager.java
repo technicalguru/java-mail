@@ -4,7 +4,6 @@
 package rs.mail.templates.cache.impl;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +91,7 @@ public abstract class AbstractCacheManager implements CacheManager {
 		}
 	}
 
-	protected <K, V> Collection<K> getCleanupPriority(Map<K,CacheEntryMeta<K>> meta) {
+	protected <K, V> List<K> getCleanupPriority(Map<K,CacheEntryMeta<K>> meta) {
 		List<CacheEntryMeta<K>> sorted = new ArrayList<>(meta.values());
 		sorted.sort(getMetaComparator());
 		return sorted.stream().map(e -> e.getKey()).collect(Collectors.toList());
