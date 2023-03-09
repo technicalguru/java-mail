@@ -90,6 +90,13 @@ public interface MessageBuilder<T> {
 	public MessageBuilder<T> withResolver(TemplateResolver ...templateResolvers);
 	
 	/**
+	 * Adds the translation resolvers to the builder.
+	 * @param i18nResolvers - new i18n resolvers to be added
+	 * @return this message builder for chaining.
+	 */
+	public MessageBuilder<T> withResolver(I18nResolver ...i18nResolvers);
+	
+	/**
 	 * Produces the message.
 	 * @return the message containing subject and body.
 	 * @throws BuilderException when building the message fails

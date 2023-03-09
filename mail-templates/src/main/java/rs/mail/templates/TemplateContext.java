@@ -27,20 +27,23 @@ public class TemplateContext {
 
 	private Map<String, Object>    values;
 	private List<TemplateResolver> resolvers;
+	private List<I18nResolver>     i18nResolvers;
 	private String                 subjectTemplateName;
 	private Template               subjectTemplate;
 	private String                 bodyTemplateName;
 	private Template               bodyTemplate;
 	private Locale                 locale;
 	private boolean                locked;
+	
 	/**
 	 * Constructor.
 	 */
 	public TemplateContext() {
-		values     = new HashMap<>();
-		resolvers  = new ArrayList<>();
-		locked     = false;
-		locale     = Locale.getDefault();
+		values        = new HashMap<>();
+		resolvers     = new ArrayList<>();
+		i18nResolvers = new ArrayList<>();
+		locked        = false;
+		locale        = Locale.getDefault();
 	}
 	
 	
@@ -228,7 +231,37 @@ public class TemplateContext {
 	}
 	
 	/**
-	 * Returns the locale for the genaration.
+	 * Add translation resolvers.
+	 * @param i18nResolvers - the resolvers to add
+	 */
+	public void addI18nResolver(I18nResolver... i18nResolvers) {
+		if (isLocked()) throw new RuntimeException("Context is locked");
+		for (I18nResolver resolver : i18nResolvers) {
+			this.i18nResolvers.add(resolver);
+		}
+	}
+
+	/**
+	 * Removes translation resolvers.
+	 * @param i18nResolvers - the resolvers to remove
+	 */
+	public void removeI18nResolver(I18nResolver... i18nResolvers) {
+		if (isLocked()) throw new RuntimeException("Context is locked");
+		for (I18nResolver resolver : i18nResolvers) {
+			this.i18nResolvers.remove(resolver);
+		}
+	}
+
+	/**
+	 * Returns the translation resolvers.
+	 * @return the list of resolvers
+	 */
+	public List<I18nResolver> getI18nResolvers() {
+		return i18nResolvers;
+	}
+	
+	/**
+	 * Returns the locale for the generation.
 	 * @return the locale (can be {@code null})
 	 */
 	public Locale getLocale() {

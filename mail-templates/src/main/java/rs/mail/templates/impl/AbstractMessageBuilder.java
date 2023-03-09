@@ -3,11 +3,15 @@
  */
 package rs.mail.templates.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.jsoup.Jsoup;
 
 import rs.mail.templates.BuilderException;
 import rs.mail.templates.BuilderResult;
 import rs.mail.templates.ContentType;
+import rs.mail.templates.I18nResolver;
 import rs.mail.templates.MessageBuilder;
 import rs.mail.templates.ResolverException;
 import rs.mail.templates.Template;
@@ -97,6 +101,15 @@ public abstract class AbstractMessageBuilder<T> implements MessageBuilder<T> {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public MessageBuilder<T> withResolver(I18nResolver... i18nResolvers) {
+		context.addI18nResolver(i18nResolvers);
+		return this;
+	}
+
+	/**
 	 * Returns the context.
 	 * @return the context
 	 */
@@ -156,19 +169,22 @@ public abstract class AbstractMessageBuilder<T> implements MessageBuilder<T> {
 	 * @throws BuilderException when the build or resolving fails.
 	 */
 	protected String build(String templateName, ContentType type) throws BuilderException {
-		Template template = null;
+		Template               template = null;
+		Map<String,String> translations = null;
 		try {
-			template = resolve(templateName);
+			template     = resolve(templateName);
+			translations = resolveTranslations(templateName);
 		} catch (ResolverException e) {
 			throw new BuilderException(this, e.getMessage(), e);
 		}
 		if (template != null) {
-			return build(template, type);
+			return build(template, type, translations);
 		}
 			
 		return null;
 	}
-	
+
+
 	/**
 	 * Fill the given template using the current context.
 	 * <p>Implementors can override this method or {@link #build(String, ContentType)} depending
@@ -179,7 +195,7 @@ public abstract class AbstractMessageBuilder<T> implements MessageBuilder<T> {
 	 * @param contentType - the content type to build
 	 * @return the template filled with translations and context values
 	 */
-	protected String build(Template template, ContentType contentType) {
+	protected String build(Template template, ContentType contentType, Map<String,String> translations) {
 		return template.getTemplate(contentType);
 	}
 	
@@ -191,19 +207,27 @@ public abstract class AbstractMessageBuilder<T> implements MessageBuilder<T> {
 	protected String buildSubject() throws BuilderException {
 		Template template = context.getSubjectTemplate();
 		if (template == null) return build(context.getSubjectTemplateName(), ContentType.TEXT);
-		return build(template, ContentType.TEXT);
+		try {
+			return build(template, ContentType.TEXT, resolveTranslations(template.getId().getId()));
+		} catch (ResolverException e) {
+			throw new BuilderException(this, e.getMessage(), e);
+		}
 	}
 	
 	/**
-	 * Build the subject of the message.
+	 * Build the body of the message.
 	 * @param contentType the content type of the build
 	 * @return the subject or {@code null} if no template available
-	 * @throws BuilderException when building the subject fails
+	 * @throws BuilderException when building the body fails
 	 */
 	protected String buildBody(ContentType contentType) throws BuilderException {
 		Template template = context.getBodyTemplate();
 		if (template == null) return build(context.getBodyTemplateName(), contentType);
-		return build(template, contentType);
+		try {
+			return build(template, contentType, resolveTranslations(template.getId().getId()));
+		} catch (ResolverException e) {
+			throw new BuilderException(this, e.getMessage(), e);
+		}
 	}
 	
 	/**
@@ -220,6 +244,20 @@ public abstract class AbstractMessageBuilder<T> implements MessageBuilder<T> {
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * Resolves the translations for the given name.
+	 * @param name - name of translations to find
+	 * @return the translations, must not be {@code null}
+	 * @throws ResolverException when resolving fails
+	 */
+	protected Map<String,String> resolveTranslations(String name) throws ResolverException {
+		Map<String,String> translations = new HashMap<>();
+		for (I18nResolver resolver : context.getI18nResolvers()) {
+			// TODO
+		}
+		return translations;
 	}
 	
 	/**
