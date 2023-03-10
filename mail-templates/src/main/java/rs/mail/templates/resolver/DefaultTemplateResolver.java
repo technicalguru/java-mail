@@ -2,12 +2,8 @@ package rs.mail.templates.resolver;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import org.apache.commons.io.IOUtils;
 
@@ -15,6 +11,7 @@ import rs.mail.templates.ContentType;
 import rs.mail.templates.ResolverException;
 import rs.mail.templates.Template;
 import rs.mail.templates.TemplateContext;
+import rs.mail.templates.TemplateResolver;
 import rs.mail.templates.cache.Cache;
 import rs.mail.templates.cache.CacheFactory;
 import rs.mail.templates.cache.CacheFactory.CacheBuilder;
@@ -48,11 +45,8 @@ import rs.mail.templates.impl.TemplateId;
  * @author ralph
  *
  */
-public class DefaultTemplateResolver extends AbstractTemplateResolver {
+public class DefaultTemplateResolver extends AbstractFileResolver<TemplateId,Template> implements TemplateResolver {
 
-	private File directory;
-	private Charset charset;
-	
 	/**
 	 * Constructor (which uses a LRU cache).
 	 * 
@@ -104,83 +98,34 @@ public class DefaultTemplateResolver extends AbstractTemplateResolver {
 	 * @throws IOException - when the directory is not accessible
 	 */
 	public DefaultTemplateResolver(File directory, Cache<TemplateId, Template> cache) throws IOException {
-		super(cache);
-		this.directory = directory;
-		this.charset   = null;
-		if (!directory.exists())      throw new FileNotFoundException("Not found: "+directory.getCanonicalPath());
-		if (!directory.isDirectory()) throw new IOException("Not a directory: "+directory.getCanonicalPath());
-		if (!directory.canRead())     throw new IOException("Cannot read: "+directory.getCanonicalPath());
+		super(directory, cache);
 	}
 
-	/**
-	 * Returns the directory.
-	 * @return the directory
-	 */
-	public File getDirectory() {
-		return directory;
-	}
-
-	/**
-	 * Returns the charset to be used.
-	 * @return charset to be used
-	 */
-	public Charset getCharset() {
-		return getCharset(false);
-	}
-	
-	/**
-	 * Sets the charset.
-	 * @param charset the charset to set
-	 */
-	public void setCharset(Charset charset) {
-		this.charset = charset;
-	}
-
-	/**
-	 * Returns the charset to be used or - if required - a default one
-	 * @param resolveWithDefault whether a default charset shall be returned when no charset was set before
-	 * @return a charset
-	 */
-	protected Charset getCharset(boolean resolveWithDefault) {
-		if (charset == null) {
-			if (resolveWithDefault) return Charset.defaultCharset();
-		}
-		return charset;
-	}
-	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected Template resolve(TemplateId id, String name, TemplateContext context) throws ResolverException {
-		Template       rc = null;
-		
-		// Find in cache
-		boolean cacheHit = false;
-		Cache<TemplateId,Template> cache = getCache();
-		if (cache != null) {
-			rc = cache.get(id);
+	protected TemplateId getId(String name, TemplateContext context) {
+		return new TemplateId(name, context.getLocale());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected Template create(TemplateId id, String name, TemplateContext context) throws ResolverException {
+		List<File> htmlPriorities = getPriorityPaths(name, context, ".html");
+		File       htmlFile       = findFile(htmlPriorities);
+		List<File> textPriorities = getPriorityPaths(name, context, ".txt");
+		File       textFile       = findFile(textPriorities);
+		if ((htmlFile != null) || (textFile != null)) try {
+			String htmlContent = htmlFile != null ? IOUtils.toString(new FileInputStream(htmlFile), getCharset(true)) : null;
+			String textContent = textFile != null ? IOUtils.toString(new FileInputStream(textFile), getCharset(true)) : null;
+			return createTemplate(id, htmlContent, textContent);
+		} catch (IOException e) {
+			throw new ResolverException(this, "Cannot load template", e);
 		}
-		if (rc == null) {
-			File htmlPriorities[] = getPriorityPaths(name, context, ContentType.HTML);
-			File htmlFile         = findFile(htmlPriorities);
-			File textPriorities[] = getPriorityPaths(name, context, ContentType.TEXT);
-			File textFile         = findFile(textPriorities);
-			if ((htmlFile != null) || (textFile != null)) try {
-				String htmlContent = htmlFile != null ? IOUtils.toString(new FileInputStream(htmlFile), getCharset(true)) : null;
-				String textContent = textFile != null ? IOUtils.toString(new FileInputStream(textFile), getCharset(true)) : null;
-				rc = createTemplate(id, htmlContent, textContent);
-			} catch (IOException e) {
-				throw new ResolverException(this, "Cannot load template", e);
-			}
-		} else {
-			cacheHit = true;
-		}
-		
-		if ((cache != null) && (rc != null) && !cacheHit) {
-			cache.put(id, rc);
-		}
-		return rc;
+		return null;
 	}
 
 	/**
@@ -202,44 +147,10 @@ public class DefaultTemplateResolver extends AbstractTemplateResolver {
 	 * @return the files to be checked
 	 * @see #getFileVariants(TemplateContext)
 	 */
-	protected File[] getPriorityPaths(String name, TemplateContext context, ContentType contentType) {
-		String suffix      = ContentType.HTML.equals(contentType) ? ".html" : ".txt";
-		boolean ftlLibrary = name.endsWith(".ftl");
-		String variants[]  = getFileVariants(context); 
-		List<File> files   = new ArrayList<>();
-		for (int i=0; i<variants.length; i++) {
-			files.add(new File(directory, name+"."+variants[i]+suffix));
-		}
-		files.add(new File(directory, name+suffix));
-		if (ftlLibrary) files.add(new File(directory, name));
-		return files.toArray(new File[files.size()]);
+	protected List<File> getPriorityPaths(String name, TemplateContext context, String suffix) {
+		List<File> rc = super.getPriorityPaths(name, context, suffix);
+		if (name.endsWith(".ftl")) rc.add(new File(getDirectory(), name));
+		return rc;
 	}
 	
-	/**
-	 * Returns the variants of the template in order of precendence.
-	 * <p>Default implementation uses the locale in the context and e.g. returns ["de-DE", "de" ]</p>
-	 * @param context - the context holding information about the message to be built
-	 * @return the list of variants to be checked for template files
-	 */
-	protected String[] getFileVariants(TemplateContext context) {
-		Locale locale = context.getLocale();
-		return new String[] {
-				locale.toLanguageTag(),
-				locale.getLanguage()
-		};
-	}
-	
-	/**
-	 * Check files in order of priorities to find the first readable.
-	 * @param priorities - list of files in order of priority
-	 * @return - the file that can be used or {@code null} if none is available
-	 */
-	protected File findFile(File priorities[]) {
-		for (File file : priorities) {
-			if (file.exists() && file.isFile() && file.canRead()) {
-				return file;
-			}
-		}
-		return null;
-	}
 }

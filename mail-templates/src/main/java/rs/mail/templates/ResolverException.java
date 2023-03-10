@@ -4,7 +4,7 @@
 package rs.mail.templates;
 
 /**
- * Thrown when template resolving fails fails.
+ * Thrown when resolving fails.
  * 
  * @author ralph
  *
@@ -13,13 +13,13 @@ public class ResolverException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 	/** The resolver that threw the exception */
-	private TemplateResolver resolver;
+	private Resolver<?> resolver;
 	
 	/**
 	 * Constructor.
 	 * @param resolver - the message resolver causing the exception
 	 */
-	public ResolverException(TemplateResolver resolver) {
+	public ResolverException(Resolver<?> resolver) {
 		this.resolver = resolver;
 	}
 
@@ -28,7 +28,7 @@ public class ResolverException extends Exception {
 	 * @param resolver - the message resolver causing the exception
 	 * @param message - error message
 	 */
-	public ResolverException(TemplateResolver resolver, String message) {
+	public ResolverException(Resolver<?> resolver, String message) {
 		super(message);
 		this.resolver = resolver;
 	}
@@ -38,7 +38,7 @@ public class ResolverException extends Exception {
 	 * @param resolver - the message resolver causing the exception
 	 * @param cause - root cause
 	 */
-	public ResolverException(TemplateResolver resolver, Throwable cause) {
+	public ResolverException(Resolver<?> resolver, Throwable cause) {
 		super(cause);
 		this.resolver = resolver;
 	}
@@ -49,7 +49,7 @@ public class ResolverException extends Exception {
 	 * @param message - error message
 	 * @param cause - root cause
 	 */
-	public ResolverException(TemplateResolver resolver, String message, Throwable cause) {
+	public ResolverException(Resolver<?> resolver, String message, Throwable cause) {
 		super(message, cause);
 		this.resolver = resolver;
 	}
@@ -58,7 +58,7 @@ public class ResolverException extends Exception {
 	 * Returns the resolver that caused the issue
 	 * @return the resolver
 	 */
-	public TemplateResolver getResolver() {
+	public Resolver<?> getResolver() {
 		return resolver;
 	}
 

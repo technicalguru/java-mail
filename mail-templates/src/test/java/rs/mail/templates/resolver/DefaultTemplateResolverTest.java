@@ -9,6 +9,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Locale;
 
 import org.junit.Before;
@@ -37,74 +38,74 @@ public class DefaultTemplateResolverTest {
 	@Test
 	public void testGetPriorityPaths_withHtml() throws IOException {
 		context.setLocale(Locale.GERMANY);
-		File files[] = resolver.getPriorityPaths("my-template", context, ContentType.HTML);
+		List<File> files = resolver.getPriorityPaths("my-template", context, ".html");
 		assertNotNull(files);
-		assertEquals(3, files.length);
-		assertEquals("my-template.de-DE.html", files[0].getName());
-		assertEquals("my-template.de.html",    files[1].getName());
-		assertEquals("my-template.html",       files[2].getName());
-		assertEquals(resolver.getDirectory(), files[0].getParentFile());
-		assertEquals(resolver.getDirectory(), files[1].getParentFile());
-		assertEquals(resolver.getDirectory(), files[2].getParentFile());
+		assertEquals(3, files.size());
+		assertEquals("my-template.de-DE.html", files.get(0).getName());
+		assertEquals("my-template.de.html",    files.get(1).getName());
+		assertEquals("my-template.html",       files.get(2).getName());
+		assertEquals(resolver.getDirectory(),  files.get(0).getParentFile());
+		assertEquals(resolver.getDirectory(),  files.get(1).getParentFile());
+		assertEquals(resolver.getDirectory(),  files.get(2).getParentFile());
 	}
 	
 	@Test
 	public void testGetPriorityPaths_withText() throws IOException {
 		context.setLocale(Locale.GERMANY);
-		File files[] = resolver.getPriorityPaths("my-template", context, ContentType.TEXT);
+		List<File> files = resolver.getPriorityPaths("my-template", context, ".txt");
 		assertNotNull(files);
-		assertEquals(3, files.length);
-		assertEquals("my-template.de-DE.txt", files[0].getName());
-		assertEquals("my-template.de.txt",    files[1].getName());
-		assertEquals("my-template.txt",       files[2].getName());
-		assertEquals(resolver.getDirectory(), files[0].getParentFile());
-		assertEquals(resolver.getDirectory(), files[1].getParentFile());
-		assertEquals(resolver.getDirectory(), files[2].getParentFile());
+		assertEquals(3, files.size());
+		assertEquals("my-template.de-DE.txt", files.get(0).getName());
+		assertEquals("my-template.de.txt",    files.get(1).getName());
+		assertEquals("my-template.txt",       files.get(2).getName());
+		assertEquals(resolver.getDirectory(), files.get(0).getParentFile());
+		assertEquals(resolver.getDirectory(), files.get(1).getParentFile());
+		assertEquals(resolver.getDirectory(), files.get(2).getParentFile());
 	}
 	
 	@Test
 	public void testGetPriorityPaths_withHtmlAndFtl() throws IOException {
 		context.setLocale(Locale.GERMANY);
-		File files[] = resolver.getPriorityPaths("my-template.ftl", context, ContentType.HTML);
+		List<File> files = resolver.getPriorityPaths("my-template.ftl", context, ".html");
 		assertNotNull(files);
-		assertEquals(4, files.length);
-		assertEquals("my-template.ftl.de-DE.html", files[0].getName());
-		assertEquals("my-template.ftl.de.html",    files[1].getName());
-		assertEquals("my-template.ftl.html",       files[2].getName());
-		assertEquals("my-template.ftl",            files[3].getName());
-		assertEquals(resolver.getDirectory(),      files[0].getParentFile());
-		assertEquals(resolver.getDirectory(),      files[1].getParentFile());
-		assertEquals(resolver.getDirectory(),      files[2].getParentFile());
-		assertEquals(resolver.getDirectory(),      files[3].getParentFile());
+		assertEquals(4, files.size());
+		assertEquals("my-template.ftl.de-DE.html", files.get(0).getName());
+		assertEquals("my-template.ftl.de.html",    files.get(1).getName());
+		assertEquals("my-template.ftl.html",       files.get(2).getName());
+		assertEquals("my-template.ftl",            files.get(3).getName());
+		assertEquals(resolver.getDirectory(),      files.get(0).getParentFile());
+		assertEquals(resolver.getDirectory(),      files.get(1).getParentFile());
+		assertEquals(resolver.getDirectory(),      files.get(2).getParentFile());
+		assertEquals(resolver.getDirectory(),      files.get(3).getParentFile());
 	}
 	
 	@Test
 	public void testGetPriorityPaths_withTextAndFtl() throws IOException {
 		context.setLocale(Locale.GERMANY);
-		File files[] = resolver.getPriorityPaths("my-template.ftl", context, ContentType.TEXT);
+		List<File> files = resolver.getPriorityPaths("my-template.ftl", context, ".txt");
 		assertNotNull(files);
-		assertEquals(4, files.length);
-		assertEquals("my-template.ftl.de-DE.txt", files[0].getName());
-		assertEquals("my-template.ftl.de.txt",    files[1].getName());
-		assertEquals("my-template.ftl.txt",       files[2].getName());
-		assertEquals("my-template.ftl",           files[3].getName());
-		assertEquals(resolver.getDirectory(),     files[0].getParentFile());
-		assertEquals(resolver.getDirectory(),     files[1].getParentFile());
-		assertEquals(resolver.getDirectory(),     files[2].getParentFile());
-		assertEquals(resolver.getDirectory(),     files[3].getParentFile());
+		assertEquals(4, files.size());
+		assertEquals("my-template.ftl.de-DE.txt", files.get(0).getName());
+		assertEquals("my-template.ftl.de.txt",    files.get(1).getName());
+		assertEquals("my-template.ftl.txt",       files.get(2).getName());
+		assertEquals("my-template.ftl",           files.get(3).getName());
+		assertEquals(resolver.getDirectory(),     files.get(0).getParentFile());
+		assertEquals(resolver.getDirectory(),     files.get(1).getParentFile());
+		assertEquals(resolver.getDirectory(),     files.get(2).getParentFile());
+		assertEquals(resolver.getDirectory(),     files.get(3).getParentFile());
 	}
 	
 	@Test
 	public void testFindFile_withNoFiles() {
 		context.setLocale(Locale.GERMANY);
-		File file = resolver.findFile(resolver.getPriorityPaths("my-template", context, ContentType.HTML));
+		File file = resolver.findFile(resolver.getPriorityPaths("my-template", context, ".html"));
 		assertNull(file);
 	}
 	
 	@Test
 	public void testFindFile_withFirstFile() {
 		context.setLocale(Locale.GERMANY);
-		File file = resolver.findFile(resolver.getPriorityPaths("test-template1", context, ContentType.HTML));
+		File file = resolver.findFile(resolver.getPriorityPaths("test-template1", context, ".html"));
 		assertNotNull(file);
 		assertEquals("test-template1.de-DE.html", file.getName());
 		assertEquals(resolver.getDirectory(), file.getParentFile());
@@ -113,7 +114,7 @@ public class DefaultTemplateResolverTest {
 	@Test
 	public void testFindFile_withSecondFile() {
 		context.setLocale(Locale.GERMANY);
-		File file = resolver.findFile(resolver.getPriorityPaths("test-template2", context, ContentType.HTML));
+		File file = resolver.findFile(resolver.getPriorityPaths("test-template2", context, ".html"));
 		assertNotNull(file);
 		assertEquals("test-template2.de.html", file.getName());
 		assertEquals(resolver.getDirectory(), file.getParentFile());
