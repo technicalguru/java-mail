@@ -4,6 +4,7 @@
 package rs.mail.templates.impl;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jsoup.Jsoup;
@@ -11,6 +12,7 @@ import org.jsoup.Jsoup;
 import rs.mail.templates.BuilderException;
 import rs.mail.templates.BuilderResult;
 import rs.mail.templates.ContentType;
+import rs.mail.templates.I18n;
 import rs.mail.templates.I18nResolver;
 import rs.mail.templates.MessageBuilder;
 import rs.mail.templates.ResolverException;
@@ -20,6 +22,9 @@ import rs.mail.templates.TemplateResolver;
 
 /**
  * Abstract base class for message builders.
+ * 
+ * @param <T> the type of message to be built
+ * 
  * @author ralph
  *
  */
@@ -59,15 +64,6 @@ public abstract class AbstractMessageBuilder<T> implements MessageBuilder<T> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public MessageBuilder<T> withBodyTemplate(Template template) {
-		context.setBodyTemplate(template);
-		return this;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public MessageBuilder<T> withSubjectTemplate(String templateName) {
 		context.setSubjectTemplate(templateName);
 		return this;
@@ -77,8 +73,8 @@ public abstract class AbstractMessageBuilder<T> implements MessageBuilder<T> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public MessageBuilder<T> withSubjectTemplate(Template template) {
-		context.setSubjectTemplate(template);
+	public MessageBuilder<T> withI18n(String i18nName) {
+		context.setI18nName(i18nName);
 		return this;
 	}
 
@@ -157,58 +153,57 @@ public abstract class AbstractMessageBuilder<T> implements MessageBuilder<T> {
 	}
 	
 	/**
-	 * Builds the template with given name and content type.
-	 * <p>Implementors can override this method or {@link #build(Template, ContentType)} depending
-	 *    on whether this abstract implementation class shall perform the resolving step. This can
-	 *    be unnecessary when implementors have its own resolution process, e.g. Freemarker.</p>
-	 * <p>The default implementation calls {@link #build(Template, ContentType)} to actually
-	 *    build the template.</p>
-	 * @param templateName - the name of the template
-	 * @param type         - the content type
+	 * Fills the given template using the current context and given translations.
+	 * <p>Implementors must override this method when they resolve templates in its
+	 *    own way (e.g. they provide a sub-template feature with their own resolve
+	 *    mechanism). If implementors do not need to adopt the resolve mechanism
+	 *    then they shall override {@link #build(Template, ContentType, Map)} and use 
+	 *    the resolved template directly.</p>
+	 * <p>The default implementation resolves the template and calls
+	 *    {@link #build(Template, ContentType, Map)}.</p>
+	 *    
+	 * @param templateName - the template name
+	 * @param contentType - the content type to build
+	 * @param translations - the translations map for the build
 	 * @return the template filled with translations and context values
 	 * @throws BuilderException when the build or resolving fails.
+	 * @see #build(Template, ContentType, Map)
 	 */
-	protected String build(String templateName, ContentType type) throws BuilderException {
-		Template               template = null;
-		Map<String,String> translations = null;
+	protected String build(String templateName, ContentType contentType, Map<String,String> translations) throws BuilderException {
 		try {
-			template     = resolve(templateName);
-			translations = resolveTranslations(templateName);
+			Template template = resolve(templateName);
+			return build(template, contentType, translations);
 		} catch (ResolverException e) {
 			throw new BuilderException(this, e.getMessage(), e);
 		}
-		if (template != null) {
-			return build(template, type, translations);
-		}
-			
-		return null;
-	}
-
-
-	/**
-	 * Fill the given template using the current context.
-	 * <p>Implementors can override this method or {@link #build(String, ContentType)} depending
-	 *    on whether this abstract implementation class shall perform the resolving step. This can
-	 *    be unnecessary when implementors have its own resolution process, e.g. Freemarker.</p>
-	 * <p>The default implementation returns the content of the template.</p>
-	 * @param template - the template object
-	 * @param contentType - the content type to build
-	 * @return the template filled with translations and context values
-	 */
-	protected String build(Template template, ContentType contentType, Map<String,String> translations) {
-		return template.getTemplate(contentType);
 	}
 	
+	/**
+	 * Fills the given template using the current context and given translations.
+	 * <p>Implementors shall override this method when they do not need to adopt 
+	 *    the resolve mechanism and just wanna use the resolved template directly.</p>
+	 * <p>The default implementation does nothing but return the template's content.</p>
+	 * 
+	 * @param template - the template
+	 * @param contentType - the content type to build
+	 * @param translations - the translations map for the build
+	 * @return the template filled with translations and context values
+	 * @throws BuilderException when the build or resolving fails.
+	 * @see #build(String, ContentType, Map)
+	 */
+	protected String build(Template template, ContentType contentType, Map<String,String> translations) throws BuilderException {
+		return template.getTemplate(contentType);
+	}
+
 	/**
 	 * Build the subject of the message
 	 * @return the subject or {@code null} if no template available
 	 * @throws BuilderException when building the subject fails
 	 */
 	protected String buildSubject() throws BuilderException {
-		Template template = context.getSubjectTemplate();
-		if (template == null) return build(context.getSubjectTemplateName(), ContentType.TEXT);
 		try {
-			return build(template, ContentType.TEXT, resolveTranslations(template.getId().getId()));
+			Map<String,String> i18n = getI18n(); 
+			return build(context.getSubjectTemplateName(), ContentType.TEXT, i18n);
 		} catch (ResolverException e) {
 			throw new BuilderException(this, e.getMessage(), e);
 		}
@@ -221,13 +216,22 @@ public abstract class AbstractMessageBuilder<T> implements MessageBuilder<T> {
 	 * @throws BuilderException when building the body fails
 	 */
 	protected String buildBody(ContentType contentType) throws BuilderException {
-		Template template = context.getBodyTemplate();
-		if (template == null) return build(context.getBodyTemplateName(), contentType);
 		try {
-			return build(template, contentType, resolveTranslations(template.getId().getId()));
+			Map<String,String> i18n = getI18n(); 
+			return build(context.getBodyTemplateName(), contentType, i18n);
 		} catch (ResolverException e) {
 			throw new BuilderException(this, e.getMessage(), e);
 		}
+	}
+	
+	/**
+	 * Resolves the translations as defined in context.
+	 * @return the translations to be used
+	 * @throws ResolverException when resolving process fails
+	 */
+	protected Map<String,String> getI18n() throws ResolverException {
+		Map<String,String> rc = resolveI18n(context.getI18nName());
+		return rc;
 	}
 	
 	/**
@@ -239,7 +243,7 @@ public abstract class AbstractMessageBuilder<T> implements MessageBuilder<T> {
 	protected Template resolve(String name) throws ResolverException {
 		if (name != null) {
 			for (TemplateResolver resolver : context.getResolvers()) {
-				Template rc = resolver.getTemplate(name, context);
+				Template rc = resolver.resolve(name, context);
 				if (rc != null) return rc;
 			}
 		}
@@ -248,14 +252,19 @@ public abstract class AbstractMessageBuilder<T> implements MessageBuilder<T> {
 	
 	/**
 	 * Resolves the translations for the given name.
+	 * <p>Translations from resolvers with higher priority precede translations from
+	 *    resolvers with lower priority.</p>
 	 * @param name - name of translations to find
 	 * @return the translations, must not be {@code null}
 	 * @throws ResolverException when resolving fails
 	 */
-	protected Map<String,String> resolveTranslations(String name) throws ResolverException {
+	protected Map<String,String> resolveI18n(String name) throws ResolverException {
 		Map<String,String> translations = new HashMap<>();
-		for (I18nResolver resolver : context.getI18nResolvers()) {
-			// TODO
+		List<I18nResolver> resolvers = context.getI18nResolvers();
+		for (int i=resolvers.size()-1; i>= 0; i--) {
+			I18nResolver resolver = resolvers.get(i);
+			I18n             i18n = resolver.resolve(name, context);
+			if (i18n != null) translations.putAll(i18n);
 		}
 		return translations;
 	}

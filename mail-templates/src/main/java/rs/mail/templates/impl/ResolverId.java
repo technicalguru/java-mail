@@ -4,32 +4,32 @@ import java.util.Locale;
 import java.util.Objects;
 
 /**
- * A i18n ID holds valuable information that 
- * is required to find translations when resolving. However, the
+ * A template ID can be used to hold valuable information that 
+ * is required to find a template when resolving. However, the
  * main information is the ID itself which is used for caching purposes.
  * 
  * @author ralph
  *
  */
-public class I18nId {
+public class ResolverId {
 	
 	private String id;
 	private Locale locale;
 	
 	/**
 	 * Constructor.
-	 * @param id - the ID of the translations.
+	 * @param id - the ID of the template.
 	 */
-	public I18nId(String id) {
+	public ResolverId(String id) {
 		this(id, null);
 	}
 	
 	/**
 	 * Constructor.
-	 * @param id - the ID of the translations.
-	 * @param locale - the locale of the translations
+	 * @param id - the ID of the template.
+	 * @param locale - the locale of the template
 	 */
-	public I18nId(String id, Locale locale) {
+	public ResolverId(String id, Locale locale) {
 		this.id     = id;
 		this.locale = locale;
 	}
@@ -67,10 +67,10 @@ public class I18nId {
 		if (this == obj) {
 			return true;
 		}
-		if (!(obj instanceof I18nId)) {
+		if (!(obj instanceof ResolverId)) {
 			return false;
 		}
-		I18nId other = (I18nId) obj;
+		ResolverId other = (ResolverId) obj;
 		return Objects.equals(id, other.id) && Objects.equals(locale, other.locale);
 	}
 

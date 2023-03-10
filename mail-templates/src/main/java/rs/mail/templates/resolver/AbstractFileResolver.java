@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -14,16 +15,19 @@ import rs.mail.templates.cache.Cache;
 import rs.mail.templates.cache.CacheFactory;
 import rs.mail.templates.cache.CacheFactory.CacheBuilder;
 import rs.mail.templates.cache.CacheStrategy;
+import rs.mail.templates.impl.ResolverId;
 
 /**
  * The default resolver searches a specific directory (non-recursive)
  * versions of a file name. The order of lookups will be provided through 
  * method ...
  * 
+ * @param <X> the type of object to be resolved
+ * 
  * @author ralph
  *
  */
-public abstract class AbstractFileResolver<K,X> extends AbstractResolver<K,X> {
+public abstract class AbstractFileResolver<X> extends AbstractResolver<X> {
 
 	private File directory;
 	private Charset charset;
@@ -32,10 +36,11 @@ public abstract class AbstractFileResolver<K,X> extends AbstractResolver<K,X> {
 	 * Constructor (which uses a LRU cache).
 	 * 
 	 * @param directory - the directory to search templates (non-recursive)
+	 * @param objectClass - the type of object to be resolved
 	 * @throws IOException - when the directory is not accessible
 	 */
-	public AbstractFileResolver(File directory, Class<K> idClass, Class<X> objectClass) throws IOException {
-		this(directory, true, idClass, objectClass);
+	public AbstractFileResolver(File directory, Class<X> objectClass) throws IOException {
+		this(directory, true, objectClass);
 	}
 	
 	/**
@@ -43,10 +48,11 @@ public abstract class AbstractFileResolver<K,X> extends AbstractResolver<K,X> {
 	 * 
 	 * @param directory - the directory to search templates (non-recursive)
 	 * @param enableCache whether to enable the Cache
+	 * @param objectClass - the type of object to be resolved
 	 * @throws IOException - when the directory is not accessible
 	 */
-	public AbstractFileResolver(File directory, boolean enableCache, Class<K> idClass, Class<X> objectClass) throws IOException {
-		this(directory, enableCache? CacheFactory.newBuilder(idClass, objectClass).with(CacheStrategy.LRU).build() : null);
+	public AbstractFileResolver(File directory, boolean enableCache, Class<X> objectClass) throws IOException {
+		this(directory, enableCache? CacheFactory.newBuilder(ResolverId.class, objectClass).with(CacheStrategy.LRU).build() : null);
 	}
 	
 	/**
@@ -54,10 +60,11 @@ public abstract class AbstractFileResolver<K,X> extends AbstractResolver<K,X> {
 	 * 
 	 * @param directory - the directory to search templates (non-recursive)
 	 * @param cacheStrategy the cahce strategy to be used
+	 * @param objectClass - the type of object to be resolved
 	 * @throws IOException - when the directory is not accessible
 	 */
-	public AbstractFileResolver(File directory, CacheStrategy cacheStrategy, Class<K> idClass, Class<X> objectClass) throws IOException {
-		this(directory, CacheFactory.newBuilder(idClass, objectClass).with(cacheStrategy));
+	public AbstractFileResolver(File directory, CacheStrategy cacheStrategy, Class<X> objectClass) throws IOException {
+		this(directory, CacheFactory.newBuilder(ResolverId.class, objectClass).with(cacheStrategy));
 	}
 	
 	/**
@@ -67,7 +74,7 @@ public abstract class AbstractFileResolver<K,X> extends AbstractResolver<K,X> {
 	 * @param cacheBuilder the cache builder
 	 * @throws IOException - when the directory is not accessible
 	 */
-	public AbstractFileResolver(File directory, CacheBuilder<K,X> cacheBuilder) throws IOException {
+	public AbstractFileResolver(File directory, CacheBuilder<ResolverId,X> cacheBuilder) throws IOException {
 		this(directory, cacheBuilder.build());
 	}
 	
@@ -78,10 +85,10 @@ public abstract class AbstractFileResolver<K,X> extends AbstractResolver<K,X> {
 	 * @param cache the cache to be used (can be null)
 	 * @throws IOException - when the directory is not accessible
 	 */
-	public AbstractFileResolver(File directory, Cache<K, X> cache) throws IOException {
+	public AbstractFileResolver(File directory, Cache<ResolverId, X> cache) throws IOException {
 		super(cache);
 		this.directory = directory;
-		this.charset   = null;
+		this.charset   = StandardCharsets.UTF_8;
 		if (!directory.exists())      throw new FileNotFoundException("Not found: "+directory.getCanonicalPath());
 		if (!directory.isDirectory()) throw new IOException("Not a directory: "+directory.getCanonicalPath());
 		if (!directory.canRead())     throw new IOException("Cannot read: "+directory.getCanonicalPath());
@@ -127,12 +134,12 @@ public abstract class AbstractFileResolver<K,X> extends AbstractResolver<K,X> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected X resolve(K id, String name, TemplateContext context) throws ResolverException {
+	protected X resolve(ResolverId id, String name, TemplateContext context) throws ResolverException {
 		X rc = null;
 		
 		// Find in cache
 		boolean cacheHit = false;
-		Cache<K,X> cache = getCache();
+		Cache<ResolverId,X> cache = getCache();
 		if (cache != null) {
 			rc = cache.get(id);
 		}
@@ -148,10 +155,27 @@ public abstract class AbstractFileResolver<K,X> extends AbstractResolver<K,X> {
 		return rc;
 	}
 
-	protected abstract X create(K id, String name, TemplateContext context) throws ResolverException;
+	/**
+	 * Creates the resolved object based on the resolver id, the name and the context.
+	 * <p>It is up to descendants to resolve files and how to incorporate in the resolved
+	 *    object. This class provides some useful methods for that purpose.</p>
+	 *    
+	 * @param id - ID of resolved object
+	 * @param name - base name of resolved object
+	 * @param context - the template context for further information
+	 * @return the created object
+	 * @throws ResolverException when resolving fails
+	 * @see #getPriorityPaths(String, TemplateContext, String)
+	 * @see #getFileVariants(TemplateContext)
+	 * @see #findFile(List)
+	 */
+	protected abstract X create(ResolverId id, String name, TemplateContext context) throws ResolverException;
 	
 	/**
 	 * Returns the files to be checked in order of priority.
+	 * <p>This implementation uses {@link #getFileVariants(TemplateContext)}, but subclasses my decide
+	 *    to overrride this method for additional files to be returned.</p>
+	 *    
 	 * @param name - the base name of the file
 	 * @param context - the context
 	 * @param suffix - the suffix of the file

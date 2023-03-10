@@ -10,52 +10,48 @@ import rs.mail.templates.cache.Cache;
 import rs.mail.templates.cache.CacheFactory;
 import rs.mail.templates.cache.CacheFactory.CacheBuilder;
 import rs.mail.templates.cache.CacheStrategy;
-import rs.mail.templates.impl.I18nId;
+import rs.mail.templates.impl.ResolverId;
 
 /**
  * Abstract implementation of resolvers that caches any result and delivers
  * when subsequent requests arrive.
  * 
- * @param <K> the ID class
  * @param <X> the resolved object class
  * 
  * @author ralph
  *
  */
-public abstract class AbstractResolver<K,X> implements Resolver<X> {
+public abstract class AbstractResolver<X> implements Resolver<X> {
 
-	private Cache<K,X> cache;
+	private Cache<ResolverId,X> cache;
 
 	/**
 	 * Default constructor (which uses a LRU cache).
 	 * 
-	 * @param idClass the class of the ID
 	 * @param objectClass the class of the resolved object
 	 */
-	public AbstractResolver(Class<K> idClass, Class<X> objectClass) {
-		this(true, idClass, objectClass);
+	public AbstractResolver(Class<X> objectClass) {
+		this(true, objectClass);
 	}
 	
 	/**
 	 * Constructor to enable or disable the default LRU cache.
 	 * 
 	 * @param enableCache whether to enable the Cache
-	 * @param idClass the class of the ID
 	 * @param objectClass the class of the resolved object
 	 */
-	public AbstractResolver(boolean enableCache, Class<K> idClass, Class<X> objectClass) {
-		this(enableCache ? CacheFactory.newBuilder(idClass, objectClass).with(CacheStrategy.LRU).build() : null);
+	public AbstractResolver(boolean enableCache, Class<X> objectClass) {
+		this(enableCache ? CacheFactory.newBuilder(ResolverId.class, objectClass).with(CacheStrategy.LRU).build() : null);
 	}
 	
 	/**
 	 * Constructor to use a specific cache strategy.
 	 * 
 	 * @param cacheStrategy the cache strategy to be used
-	 * @param idClass the class of the ID
 	 * @param objectClass the class of the resolved object
 	 */
-	public AbstractResolver(CacheStrategy cacheStrategy, Class<K> idClass, Class<X> objectClass) {
-		this(CacheFactory.newBuilder(idClass, objectClass).with(cacheStrategy));
+	public AbstractResolver(CacheStrategy cacheStrategy, Class<X> objectClass) {
+		this(CacheFactory.newBuilder(ResolverId.class, objectClass).with(cacheStrategy));
 	}
 	
 	/**
@@ -63,7 +59,7 @@ public abstract class AbstractResolver<K,X> implements Resolver<X> {
 	 * 
 	 * @param cacheBuilder the cache builder
 	 */
-	public AbstractResolver(CacheBuilder<K,X> cacheBuilder) {
+	public AbstractResolver(CacheBuilder<ResolverId,X> cacheBuilder) {
 		this(cacheBuilder.build());
 	}
 	
@@ -72,7 +68,7 @@ public abstract class AbstractResolver<K,X> implements Resolver<X> {
 	 * 
 	 * @param cache the cache to be used (can be null)
 	 */
-	public AbstractResolver(Cache<K, X> cache) {
+	public AbstractResolver(Cache<ResolverId, X> cache) {
 		this.cache = cache;
 	}
 
@@ -90,7 +86,7 @@ public abstract class AbstractResolver<K,X> implements Resolver<X> {
 	 * 
 	 * @return the cache or {@code null} if no cache is present.
 	 */
-	protected Cache<K, X> getCache() {
+	protected Cache<ResolverId, X> getCache() {
 		return cache;
 	}
 	
@@ -104,7 +100,7 @@ public abstract class AbstractResolver<K,X> implements Resolver<X> {
 	 */
 	public X resolve(String name, TemplateContext context) throws ResolverException {
 		X rc = null;
-		K id = getId(name, context);
+		ResolverId id = getId(name, context);
 		if (cache != null) {
 			rc   = cache.get(id);
 			if (rc == null) {
@@ -123,21 +119,21 @@ public abstract class AbstractResolver<K,X> implements Resolver<X> {
 	 * Construct a unique ID object.
 	 * <p>The default implementation returns a simple ID object that holds the name of the translations.</p>.
 	 * 
-	 * @param name - name of translations
+	 * @param name - name of object
 	 * @param context - context for usage
 	 * @return - ID object
-	 * @see I18nId
+	 * @see ResolverId
 	 */
-	protected abstract K getId(String name, TemplateContext context);
+	protected abstract ResolverId getId(String name, TemplateContext context);
 	
 	/**
 	 * Actually tries to resolve the template using the given meta information.
 	 * 
-	 * @param id - the template ID object
+	 * @param id - the resolver ID object
 	 * @param name - the name of the object
 	 * @param context - the context
 	 * @return the template resolved or {@code null} if not available from this resolver.
 	 * @throws ResolverException when resolving the template fails
 	 */
-	protected abstract X resolve(K id, String name, TemplateContext context) throws ResolverException;
+	protected abstract X resolve(ResolverId id, String name, TemplateContext context) throws ResolverException;
 }

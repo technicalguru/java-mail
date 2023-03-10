@@ -45,13 +45,6 @@ public interface MessageBuilder<T> {
 	public MessageBuilder<T> withBodyTemplate(String templateName);
 	
 	/**
-	 * Sets the template to be used (ignoring any template resolver) for the body.
-	 * @param template - the template to be used for the message body
-	 * @return this message builder for chaining.
-	 */
-	public MessageBuilder<T> withBodyTemplate(Template template);
-	
-	/**
 	 * Sets the template name for the body.
 	 * @param templateName - name of template to be used for the message subject
 	 * @return this message builder for chaining.
@@ -59,11 +52,11 @@ public interface MessageBuilder<T> {
 	public MessageBuilder<T> withSubjectTemplate(String templateName);
 	
 	/**
-	 * Sets the template to be used (ignoring any template resolver).
-	 * @param template - the template to be used for the message subject
+	 * Sets the translations.
+	 * @param i18nName - name of translations to be used for the message subject
 	 * @return this message builder for chaining.
 	 */
-	public MessageBuilder<T> withSubjectTemplate(Template template);
+	public MessageBuilder<T> withI18n(String i18nName);
 	
 	/**
 	 * Adds a value object to the builder. The name will be the simple class name of that object.

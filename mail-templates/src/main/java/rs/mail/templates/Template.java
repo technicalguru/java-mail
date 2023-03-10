@@ -3,7 +3,7 @@
  */
 package rs.mail.templates;
 
-import rs.mail.templates.impl.TemplateId;
+import rs.mail.templates.impl.ResolverId;
 
 /**
  * Interface for a mail template.
@@ -21,7 +21,7 @@ public interface Template {
 	 * Returns the ID of the template.
 	 * @return the id
 	 */
-	public TemplateId getId();
+	public ResolverId getId();
 
 	/**
 	 * Returns the template for the given content type.

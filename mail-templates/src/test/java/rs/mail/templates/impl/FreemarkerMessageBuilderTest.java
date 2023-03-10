@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Locale;
 
 import org.junit.Before;
@@ -41,7 +42,7 @@ public class FreemarkerMessageBuilderTest {
 				.withResolver(resolver)
 				.withSubjectTemplate("simple-template");
 		
-		String result = builder.build("simple-template", ContentType.TEXT);
+		String result = builder.build("simple-template", ContentType.TEXT, new HashMap<>());
 		assertNotNull(result);
 		assertEquals("A message: my-product is available at http://example.com/product", result.trim());
 	}
@@ -53,7 +54,7 @@ public class FreemarkerMessageBuilderTest {
 				.withResolver(primaryResolver, fallbackResolver)
 				.withSubjectTemplate("fallback-template");
 		
-		String result = builder.build("fallback-template", ContentType.TEXT);
+		String result = builder.build("fallback-template", ContentType.TEXT, new HashMap<>());
 		assertNotNull(result);
 		assertEquals("FALLBACK: A message: my-product is available at http://example.com/product", result.trim());
 	}
@@ -65,7 +66,7 @@ public class FreemarkerMessageBuilderTest {
 				.withResolver(primaryResolver, fallbackResolver)
 				.withSubjectTemplate("main-template");
 		
-		String result = builder.build("main-template", ContentType.TEXT);
+		String result = builder.build("main-template", ContentType.TEXT, new HashMap<>());
 		assertNotNull(result);
 		assertEquals("***START-OF-MAIN*** FALLBACK: A message: my-product is available at http://example.com/product ***END-OF-MAIN***", result.trim());
 	}

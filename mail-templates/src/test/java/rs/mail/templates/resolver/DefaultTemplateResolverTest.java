@@ -20,7 +20,7 @@ import rs.mail.templates.ContentType;
 import rs.mail.templates.ResolverException;
 import rs.mail.templates.Template;
 import rs.mail.templates.TemplateContext;
-import rs.mail.templates.impl.TemplateId;
+import rs.mail.templates.impl.ResolverId;
 
 /**
  * Tests the {@link DefaultTemplateResolver}.
@@ -123,7 +123,7 @@ public class DefaultTemplateResolverTest {
 	@Test
 	public void testResolve_withNoTemplate() throws ResolverException {
 		context.setLocale(Locale.GERMANY);
-		TemplateId     id = new TemplateId("my-template", Locale.GERMANY);
+		ResolverId     id = new ResolverId("my-template", Locale.GERMANY);
 		Template template = resolver.resolve(id, id.getId(), context);
 		assertNull(template);
 	}
@@ -131,7 +131,7 @@ public class DefaultTemplateResolverTest {
 	@Test
 	public void testResolve_withTemplate() throws ResolverException {
 		context.setLocale(Locale.GERMANY);
-		TemplateId     id = new TemplateId("test-template1", Locale.GERMANY);
+		ResolverId     id = new ResolverId("test-template1", Locale.GERMANY);
 		Template template = resolver.resolve(id, id.getId(), context);
 		assertNotNull(template);
 		assertEquals(id, template.getId());
@@ -140,7 +140,7 @@ public class DefaultTemplateResolverTest {
 	@Test
 	public void testResolve_withCacheHit() throws ResolverException {
 		context.setLocale(Locale.GERMANY);
-		TemplateId     id = new TemplateId("test-template2", Locale.GERMANY);
+		ResolverId     id = new ResolverId("test-template2", Locale.GERMANY);
 		
 		// Create cache entry
 		Template template = resolver.resolve(id, id.getId(), context);
@@ -159,7 +159,7 @@ public class DefaultTemplateResolverTest {
 	public void testResolve_withoutCache() throws ResolverException, IOException {
 		resolver = new DefaultTemplateResolver(new File(curDir, "src/test/resources/resolver"), false);
 		context.setLocale(Locale.GERMANY);
-		TemplateId     id = new TemplateId("test-template1", Locale.GERMANY);
+		ResolverId     id = new ResolverId("test-template1", Locale.GERMANY);
 		Template template = resolver.resolve(id, id.getId(), context);
 		assertNotNull(template);
 		assertEquals(id, template.getId());
@@ -174,14 +174,14 @@ public class DefaultTemplateResolverTest {
 		resolver = new DefaultTemplateResolver(new File(curDir, "src/test/resources/resolver"), true);
 		// Resolve with Language 1
 		context.setLocale(Locale.GERMANY);
-		TemplateId     id1 = new TemplateId("test-template3", Locale.GERMANY);
+		ResolverId     id1 = new ResolverId("test-template3", Locale.GERMANY);
 		Template template1 = resolver.resolve(id1, id1.getId(), context);
 		assertNotNull(template1);
 		assertEquals(id1, template1.getId());
 		
 		// Resolve with Language 2
 		context.setLocale(Locale.ENGLISH);
-		TemplateId     id2 = new TemplateId("test-template3", Locale.ENGLISH);
+		ResolverId     id2 = new ResolverId("test-template3", Locale.ENGLISH);
 		Template template2 = resolver.resolve(id2, id2.getId(), context);
 		assertNotNull(template2);
 		assertEquals(id2, template2.getId());

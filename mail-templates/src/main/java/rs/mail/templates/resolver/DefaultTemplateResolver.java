@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 
-import rs.mail.templates.ContentType;
 import rs.mail.templates.ResolverException;
 import rs.mail.templates.Template;
 import rs.mail.templates.TemplateContext;
@@ -17,7 +16,7 @@ import rs.mail.templates.cache.CacheFactory;
 import rs.mail.templates.cache.CacheFactory.CacheBuilder;
 import rs.mail.templates.cache.CacheStrategy;
 import rs.mail.templates.impl.DefaultTemplate;
-import rs.mail.templates.impl.TemplateId;
+import rs.mail.templates.impl.ResolverId;
 
 /**
  * The default template resolver searches a specific directory (non-recursive)
@@ -38,14 +37,14 @@ import rs.mail.templates.impl.TemplateId;
  * <li>&lt;directory&gt;/my-template.html</li>
  * <li>&lt;directory&gt;/my-template.txt</li>
  * </ol>
- * <p>The prioritized list of paths can be changed by overrriding {@link #getPriorityPaths(String, TemplateContext, ContentType)}.</p>
+ * <p>The prioritized list of paths can be changed by overrriding {@link #getPriorityPaths(String, TemplateContext, String)}.</p>
  * 
  * <p>Please notice that an additiona file {@code <directory>/my-template.ftl} will be returned when the name was {@code my-template.ftl}
  *    (ends with {@code .ftl}). This allows an easier inclusion of general Freemarker libraries.</p>
  * @author ralph
  *
  */
-public class DefaultTemplateResolver extends AbstractFileResolver<TemplateId,Template> implements TemplateResolver {
+public class DefaultTemplateResolver extends AbstractFileResolver<Template> implements TemplateResolver {
 
 	/**
 	 * Constructor (which uses a LRU cache).
@@ -65,7 +64,7 @@ public class DefaultTemplateResolver extends AbstractFileResolver<TemplateId,Tem
 	 * @throws IOException - when the directory is not accessible
 	 */
 	public DefaultTemplateResolver(File directory, boolean enableCache) throws IOException {
-		this(directory, enableCache? CacheFactory.newBuilder(TemplateId.class, Template.class).with(CacheStrategy.LRU).build() : null);
+		this(directory, enableCache? CacheFactory.newBuilder(ResolverId.class, Template.class).with(CacheStrategy.LRU).build() : null);
 	}
 	
 	/**
@@ -76,7 +75,7 @@ public class DefaultTemplateResolver extends AbstractFileResolver<TemplateId,Tem
 	 * @throws IOException - when the directory is not accessible
 	 */
 	public DefaultTemplateResolver(File directory, CacheStrategy cacheStrategy) throws IOException {
-		this(directory, CacheFactory.newBuilder(TemplateId.class, Template.class).with(cacheStrategy));
+		this(directory, CacheFactory.newBuilder(ResolverId.class, Template.class).with(cacheStrategy));
 	}
 	
 	/**
@@ -86,7 +85,7 @@ public class DefaultTemplateResolver extends AbstractFileResolver<TemplateId,Tem
 	 * @param cacheBuilder the cache builder
 	 * @throws IOException - when the directory is not accessible
 	 */
-	public DefaultTemplateResolver(File directory, CacheBuilder<TemplateId,Template> cacheBuilder) throws IOException {
+	public DefaultTemplateResolver(File directory, CacheBuilder<ResolverId,Template> cacheBuilder) throws IOException {
 		this(directory, cacheBuilder.build());
 	}
 	
@@ -97,7 +96,7 @@ public class DefaultTemplateResolver extends AbstractFileResolver<TemplateId,Tem
 	 * @param cache the cache to be used (can be null)
 	 * @throws IOException - when the directory is not accessible
 	 */
-	public DefaultTemplateResolver(File directory, Cache<TemplateId, Template> cache) throws IOException {
+	public DefaultTemplateResolver(File directory, Cache<ResolverId, Template> cache) throws IOException {
 		super(directory, cache);
 	}
 
@@ -105,15 +104,15 @@ public class DefaultTemplateResolver extends AbstractFileResolver<TemplateId,Tem
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected TemplateId getId(String name, TemplateContext context) {
-		return new TemplateId(name, context.getLocale());
+	protected ResolverId getId(String name, TemplateContext context) {
+		return new ResolverId(name, context.getLocale());
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected Template create(TemplateId id, String name, TemplateContext context) throws ResolverException {
+	protected Template create(ResolverId id, String name, TemplateContext context) throws ResolverException {
 		List<File> htmlPriorities = getPriorityPaths(name, context, ".html");
 		File       htmlFile       = findFile(htmlPriorities);
 		List<File> textPriorities = getPriorityPaths(name, context, ".txt");
@@ -135,7 +134,7 @@ public class DefaultTemplateResolver extends AbstractFileResolver<TemplateId,Tem
 	 * @param textContent - TEXT content
 	 * @return the created template
 	 */
-	protected Template createTemplate(TemplateId id, String htmlContent, String textContent) {
+	protected Template createTemplate(ResolverId id, String htmlContent, String textContent) {
 		return new DefaultTemplate(id, htmlContent, textContent);
 	}
 	
@@ -143,7 +142,7 @@ public class DefaultTemplateResolver extends AbstractFileResolver<TemplateId,Tem
 	 * Returns the files to be checked in order of priority.
 	 * @param name - the name of the template
 	 * @param context - the context
-	 * @param contentType - the content type of the template
+	 * @param suffix - the suffix to be checked (usually .html and .txt)
 	 * @return the files to be checked
 	 * @see #getFileVariants(TemplateContext)
 	 */

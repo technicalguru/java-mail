@@ -89,13 +89,15 @@ public class FreemarkerMessageBuilder<T> extends AbstractMessageBuilder<T> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected String build(String templateName, ContentType contentType) throws BuilderException {
+	protected String build(String templateName, ContentType contentType, Map<String,String> translations) throws BuilderException {
 		TemplateContext          context = getContext();
 		Configuration            config  = getFreemarkerConfiguration();
 		FreemarkerTemplateLoader loader  = getFreemarkerTemplateLoader();
 		
-		// Always recreate the data model (basically it's the context)
+		// Create the data model with values
 		Map<String, Object> root = new HashMap<>(context.getValues());
+		// Add translations
+		root.put("i18n", translations);
 		
 		try {
 			loader.setContentType(contentType);

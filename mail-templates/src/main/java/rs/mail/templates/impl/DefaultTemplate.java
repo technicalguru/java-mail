@@ -23,14 +23,14 @@ import rs.mail.templates.Template;
  */
 public class DefaultTemplate implements Template {
 
-	private TemplateId id;
+	private ResolverId id;
 	private Map<ContentType,String> content;
 	
 	/**
 	 * Default constructor.
 	 * @param id ID of template
 	 */
-	public DefaultTemplate(TemplateId id) {
+	public DefaultTemplate(ResolverId id) {
 		this(id, (String)null, (String)null);
 	}
 
@@ -42,7 +42,7 @@ public class DefaultTemplate implements Template {
 	 * @param charset - the charset to load with
 	 * @throws IOException when loading the templates fails
 	 */
-	public DefaultTemplate(TemplateId id, URL htmlContent, URL textContent, Charset charset) throws IOException {
+	public DefaultTemplate(ResolverId id, URL htmlContent, URL textContent, Charset charset) throws IOException {
 		content = new HashMap<>();
 		this.id = id;
 		setContent(ContentType.HTML, htmlContent, charset);
@@ -57,7 +57,7 @@ public class DefaultTemplate implements Template {
 	 * @param charset - the charset to load with
 	 * @throws IOException when loading the templates fails
 	 */
-	public DefaultTemplate(TemplateId id, File htmlContent, File textContent, Charset charset) throws IOException {
+	public DefaultTemplate(ResolverId id, File htmlContent, File textContent, Charset charset) throws IOException {
 		content = new HashMap<>();
 		this.id = id;
 		setContent(ContentType.HTML, htmlContent, charset);
@@ -72,7 +72,7 @@ public class DefaultTemplate implements Template {
 	 * @param charset - the charset to load with
 	 * @throws IOException when loading the templates fails
 	 */
-	public DefaultTemplate(TemplateId id, InputStream htmlContent, InputStream textContent, Charset charset) throws IOException {
+	public DefaultTemplate(ResolverId id, InputStream htmlContent, InputStream textContent, Charset charset) throws IOException {
 		content = new HashMap<>();
 		this.id = id;
 		setContent(ContentType.HTML, htmlContent, charset);
@@ -86,7 +86,7 @@ public class DefaultTemplate implements Template {
 	 * @param textContent - the TEXT content reader
 	 * @throws IOException when loading the templates fails
 	 */
-	public DefaultTemplate(TemplateId id, Reader htmlContent, Reader textContent) throws IOException {
+	public DefaultTemplate(ResolverId id, Reader htmlContent, Reader textContent) throws IOException {
 		content = new HashMap<>();
 		this.id = id;
 		setContent(ContentType.HTML, htmlContent);
@@ -99,7 +99,7 @@ public class DefaultTemplate implements Template {
 	 * @param htmlContent - the HTML content
 	 * @param textContent - the TEXT content
 	 */
-	public DefaultTemplate(TemplateId id, String htmlContent, String textContent) {
+	public DefaultTemplate(ResolverId id, String htmlContent, String textContent) {
 		content = new HashMap<>();
 		this.id = id;
 		setContent(ContentType.HTML, htmlContent);
@@ -110,7 +110,7 @@ public class DefaultTemplate implements Template {
 	 * Returns the id.
 	 * @return the id
 	 */
-	public TemplateId getId() {
+	public ResolverId getId() {
 		return id;
 	}
 

@@ -29,9 +29,8 @@ public class TemplateContext {
 	private List<TemplateResolver> resolvers;
 	private List<I18nResolver>     i18nResolvers;
 	private String                 subjectTemplateName;
-	private Template               subjectTemplate;
 	private String                 bodyTemplateName;
-	private Template               bodyTemplate;
+	private String                 i18nName;
 	private Locale                 locale;
 	private boolean                locked;
 	
@@ -150,23 +149,6 @@ public class TemplateContext {
 	}
 
 	/**
-	 * Sets the body template.
-	 * @param template - the template
-	 */
-	public void setBodyTemplate(Template template) {
-		if (isLocked()) throw new RuntimeException("Context is locked");
-		this.bodyTemplate = template;
-	}
-
-	/**
-	 * Returns the body template.
-	 * @return the bodyTemplate
-	 */
-	public Template getBodyTemplate() {
-		return bodyTemplate;
-	}
-
-	/**
 	 * Sets the name of the subject template.
 	 * @param templateName - the name of the template
 	 */
@@ -184,20 +166,21 @@ public class TemplateContext {
 	}
 
 	/**
-	 * Sets the subject template.
-	 * @param template - the template
+	 * Returns the name of the translations.
+	 * @return the name of the translations
 	 */
-	public void setSubjectTemplate(Template template) {
-		if (isLocked()) throw new RuntimeException("Context is locked");
-		this.subjectTemplate = template;
+	public String getI18nName() {
+		return i18nName;
 	}
 
+
 	/**
-	 * Returns the subject template.
-	 * @return the subjectTemplate
+	 * Sets the name of the translations.
+	 * @param i18nName the name of the translations to set
 	 */
-	public Template getSubjectTemplate() {
-		return subjectTemplate;
+	public void setI18nName(String i18nName) {
+		if (isLocked()) throw new RuntimeException("Context is locked");
+		this.i18nName = i18nName;
 	}
 
 	/**
@@ -284,10 +267,10 @@ public class TemplateContext {
 		if (isLocked()) throw new RuntimeException("Context is locked");
 		this.values.putAll(other.values);
 		this.resolvers.addAll(other.resolvers);
+		this.i18nResolvers.addAll(other.i18nResolvers);
 		this.subjectTemplateName = other.subjectTemplateName;
-		this.subjectTemplate     = other.subjectTemplate;
 		this.bodyTemplateName    = other.bodyTemplateName;
-		this.bodyTemplate        = other.bodyTemplate;
+		this.i18nName            = other.i18nName;
 		if (other.locale != null) this.locale = other.locale;
 	}
 }
