@@ -16,8 +16,10 @@ import org.junit.Test;
 import rs.mail.templates.BuilderException;
 import rs.mail.templates.BuilderResult;
 import rs.mail.templates.ContentType;
+import rs.mail.templates.I18nResolver;
 import rs.mail.templates.TemplateContext;
 import rs.mail.templates.TemplateResolver;
+import rs.mail.templates.resolver.DefaultI18nResolver;
 import rs.mail.templates.resolver.DefaultTemplateResolver;
 
 /**
@@ -33,6 +35,7 @@ public class FreemarkerMessageBuilderTest {
 	private TemplateResolver resolver;
 	private TemplateResolver primaryResolver;
 	private TemplateResolver fallbackResolver;
+	private I18nResolver     i18nResolver;
 	private TemplateContext  context;
 
 	@Test
@@ -71,11 +74,28 @@ public class FreemarkerMessageBuilderTest {
 		assertEquals("***START-OF-MAIN*** FALLBACK: A message: my-product is available at http://example.com/product ***END-OF-MAIN***", result.trim());
 	}
 	
+	@Test
+	public void testBuild_withTranslations() throws BuilderException {
+		FreemarkerMessageBuilder<BuilderResult> builder = (FreemarkerMessageBuilder<BuilderResult>)new FreemarkerMessageBuilder<>(new BuilderResultCreator())
+				.withContext(context)
+				.withResolver(resolver)
+				.withResolver(i18nResolver)
+				.withSubjectTemplate("translation-template")
+				.withBodyTemplate("translation-template")
+				.withI18n("translation-template");
+		
+		String result = builder.buildBody(ContentType.TEXT);
+		assertNotNull(result);
+		assertEquals("Ein Template mit einer deutschen Variable und einer shared variable - und einer global variable.", result.trim());
+	}
+	
+
 	@Before
 	public void beforeEach() throws IOException {
 		resolver = new DefaultTemplateResolver(new File(curDir, "src/test/resources/freemarker"));
 		primaryResolver  = new DefaultTemplateResolver(new File(curDir, "src/test/resources/freemarker/primary"));
 		fallbackResolver = new DefaultTemplateResolver(new File(curDir, "src/test/resources/freemarker/fallback"));
+		i18nResolver     = new DefaultI18nResolver(new File(curDir, "src/test/resources/freemarker"));
 		context  = new TemplateContext();
 		context.setLocale(Locale.GERMANY);
 		context.setValue("object", new Product());
