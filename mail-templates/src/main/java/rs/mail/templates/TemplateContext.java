@@ -85,9 +85,20 @@ public class TemplateContext {
 	 * @param clazz - class of object to be returned
 	 * @return the object or {@code null} if it does not exist
 	 */
-	@SuppressWarnings("unchecked")
 	public <T> T getValue(Class<T> clazz) {
-		return (T)values.get(getDefaultName(clazz));
+		return getValue(getDefaultName(clazz), clazz);
+	}
+	
+	/**
+	 * Returns the object of given class.
+	 * @param <T> - the class type
+	 * @param name - name of object to be returned
+	 * @param clazz - class of object to be returned
+	 * @return the object or {@code null} if it does not exist
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> T getValue(String name, Class<T> clazz) {
+		return (T)values.get(name);
 	}
 	
 	/**
