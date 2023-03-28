@@ -41,6 +41,11 @@
 			<artifactId>freemarker</artifactId>
 			<version>2.3.32</version>
 		</dependency>
+		<dependency>
+		    <groupId>no.api.freemarker</groupId>
+		    <artifactId>freemarker-java8</artifactId>
+		    <version>2.1.0</version>
+		</dependency>
 
 		<dependency>
 		    <groupId>org.jsoup</groupId>

@@ -13,6 +13,7 @@ import org.apache.commons.io.output.StringBuilderWriter;
 import freemarker.cache.NullCacheStorage;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateExceptionHandler;
+import no.api.freemarker.java8.Java8ObjectWrapper;
 import rs.mail.templates.BuilderException;
 import rs.mail.templates.ContentType;
 import rs.mail.templates.MessageBuilder;
@@ -70,6 +71,7 @@ public class FreemarkerMessageBuilder<T> extends AbstractMessageBuilder<T> {
 		cfg.setFallbackOnNullLoopVariable(false);
 		cfg.setSQLDateAndTimeTimeZone(TimeZone.getDefault());
 		cfg.setCacheStorage(new NullCacheStorage());
+		cfg.setObjectWrapper(new Java8ObjectWrapper(Configuration.VERSION_2_3_31));
 		return cfg;
 	}
 	
