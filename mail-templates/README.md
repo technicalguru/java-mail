@@ -156,3 +156,22 @@ Freemarker documentation describes.
 Remember that each sub-template will be resolved from scratch, means it can be a more language
 specific template or a primary or fallback template regardless where the including template
 was loaded from.
+
+# Freemarker Configuration
+The default builder will include various configurations such as support for JavaTime classes
+(see [java.time support for FreeMarker](https://github.com/lazee/freemarker-java-8)).
+
+Here is the snippet from `FreemarkerMessageBuilder` that configures Freemarker.
+
+```
+Configuration cfg = new Configuration(Configuration.VERSION_2_3_31);
+cfg.setTemplateLoader(getFreemarkerTemplateLoader());
+cfg.setDefaultEncoding("UTF-8");
+cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+cfg.setLogTemplateExceptions(false);
+cfg.setWrapUncheckedExceptions(true);
+cfg.setFallbackOnNullLoopVariable(false);
+cfg.setSQLDateAndTimeTimeZone(TimeZone.getDefault());
+cfg.setCacheStorage(new NullCacheStorage());
+cfg.setObjectWrapper(new Java8ObjectWrapper(Configuration.VERSION_2_3_31));
+```
