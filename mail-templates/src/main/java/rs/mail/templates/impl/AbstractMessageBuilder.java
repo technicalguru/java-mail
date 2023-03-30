@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.jsoup.Jsoup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import rs.mail.templates.BuilderException;
 import rs.mail.templates.BuilderResult;
@@ -30,7 +32,8 @@ import rs.mail.templates.TemplateResolver;
  */
 public abstract class AbstractMessageBuilder<T> implements MessageBuilder<T> {
 
-	private TemplateContext   context = new TemplateContext();
+	private Logger            log            = LoggerFactory.getLogger(getClass());
+	private TemplateContext   context        = new TemplateContext();
 	private MessageCreator<T> messageCreator;
 	
 	/**
@@ -134,6 +137,11 @@ public abstract class AbstractMessageBuilder<T> implements MessageBuilder<T> {
 	public BuilderResult buildContent() throws BuilderException {
 		// It is important to lock the context
 		context.lock();
+		
+		// Issue a warning when the locale was undefined
+		if ((context.getLocale() == null) || context.getLocale().toString().equals("")) {
+			log.warn("Locale is undefined");
+		}
 		
 		String subject = buildSubject();
 		String html    = buildBody(ContentType.HTML);
