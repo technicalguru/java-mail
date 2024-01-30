@@ -3,12 +3,11 @@
 	<parent>
 		<groupId>eu.ralph-schuster</groupId>
 		<artifactId>mail</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1</version>
 	</parent>
 
 	<properties>
 		<project.home>https://github.com/technicalguru/java-mail</project.home>
-		<maven.bundle.version>5.1.8</maven.bundle.version>
 		<java.version>17</java.version>
 		<maven.compiler.source>17</maven.compiler.source>
 		<maven.compiler.target>17</maven.compiler.target>
@@ -34,12 +33,12 @@
 		<dependency>
 			<groupId>eu.ralph-schuster</groupId>
 			<artifactId>baselib</artifactId>
-			<version>4.1.0</version>
+			<version>4.1.2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.cowwoc.token-bucket</groupId>
 			<artifactId>token-bucket</artifactId>
-			<version>6.0</version>
+			<version>6.1</version>
 			<exclusions>
 				<exclusion>
 					<groupId>ch.qos.logback</groupId>
@@ -50,23 +49,12 @@
 		<dependency>
 			<groupId>org.simplejavamail</groupId>
 			<artifactId>simple-java-mail</artifactId>
-			<version>6.7.6</version>
+			<version>8.6.2</version>
 		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<version>${maven.bundle.version}</version>
-				<extensions>true</extensions>
-				<configuration>
-					<instructions>
-						<Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-					</instructions>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
