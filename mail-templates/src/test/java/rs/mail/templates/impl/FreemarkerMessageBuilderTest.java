@@ -1,7 +1,7 @@
 package rs.mail.templates.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,9 +9,9 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Locale;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import rs.mail.templates.BuilderException;
 import rs.mail.templates.BuilderResult;
@@ -90,7 +90,7 @@ public class FreemarkerMessageBuilderTest {
 	}
 	
 
-	@Before
+	@BeforeEach
 	public void beforeEach() throws IOException {
 		resolver = new DefaultTemplateResolver(new File(curDir, "src/test/resources/freemarker"));
 		primaryResolver  = new DefaultTemplateResolver(new File(curDir, "src/test/resources/freemarker/primary"));
@@ -102,7 +102,7 @@ public class FreemarkerMessageBuilderTest {
 		context.setValue("aMessage", "A message");
 	}
 	
-	@BeforeClass
+	@BeforeAll
 	public static void beforeClass() {
 		curDir = Paths.get("").toAbsolutePath().toFile();
 	}

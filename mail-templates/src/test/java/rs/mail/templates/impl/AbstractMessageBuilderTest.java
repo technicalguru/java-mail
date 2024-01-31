@@ -1,16 +1,16 @@
 package rs.mail.templates.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Locale;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import rs.mail.templates.BuilderException;
 import rs.mail.templates.BuilderResult;
@@ -132,14 +132,14 @@ public class AbstractMessageBuilderTest {
 		return (AbstractMessageBuilder<BuilderResult>)MessageBuilderFactory.newBuilder(new BuilderResultCreator());
 	}
 	
-	@Before
+	@BeforeEach
 	public void beforeEach() throws IOException {
 		resolver = new DefaultTemplateResolver(new File(curDir, "src/test/resources/resolver"));
 		context  = new TemplateContext();
 		context.setLocale(Locale.GERMANY);
 	}
 	
-	@BeforeClass
+	@BeforeAll
 	public static void beforeClass() {
 		curDir = Paths.get("").toAbsolutePath().toFile();
 	}

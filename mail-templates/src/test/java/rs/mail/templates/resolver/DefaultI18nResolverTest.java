@@ -1,10 +1,10 @@
 package rs.mail.templates.resolver;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,9 +12,9 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import rs.mail.templates.I18n;
 import rs.mail.templates.ResolverException;
@@ -130,13 +130,13 @@ public class DefaultI18nResolverTest {
 	}
 	
 
-	@Before
+	@BeforeEach
 	public void beforeEach() throws IOException {
 		resolver = new DefaultI18nResolver(new File(curDir, "src/test/resources/resolver"));
 		context  = new TemplateContext();
 	}
 	
-	@BeforeClass
+	@BeforeAll
 	public static void beforeClass() {
 		curDir = Paths.get("").toAbsolutePath().toFile();
 	}

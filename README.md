@@ -10,7 +10,7 @@ two parts:
 
 ## Latest Version
 
-Latest version is 1.0.0.
+Latest version is 1.0.2.
 
 ## Documentation
 
