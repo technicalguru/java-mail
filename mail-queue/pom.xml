@@ -21,21 +21,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>jakarta.mail</groupId>
-			<artifactId>jakarta.mail-api</artifactId>
-			<version>2.1.3</version>
-		</dependency>
-		<dependency>
-		    <groupId>com.sun.mail</groupId>
-		    <artifactId>jakarta.mail</artifactId>
-		    <version>2.0.1</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.ralph-schuster</groupId>
-			<artifactId>baselib</artifactId>
-			<version>5.0.0</version>
-		</dependency>
-		<dependency>
 			<groupId>com.github.cowwoc.token-bucket</groupId>
 			<artifactId>token-bucket</artifactId>
 			<version>6.1</version>
