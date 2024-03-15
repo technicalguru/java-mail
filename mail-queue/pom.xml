@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>eu.ralph-schuster</groupId>
 		<artifactId>mail</artifactId>
-		<version>1.0.2</version>
+		<version>1.1.0</version>
 	</parent>
 
 	<properties>
@@ -21,21 +21,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>javax.mail</groupId>
-			<artifactId>javax.mail-api</artifactId>
-			<version>1.6.2</version>
-		</dependency>
-		<dependency>
-		    <groupId>com.sun.mail</groupId>
-		    <artifactId>javax.mail</artifactId>
-		    <version>1.6.2</version>
-		</dependency>
-		<dependency>
-			<groupId>eu.ralph-schuster</groupId>
-			<artifactId>baselib</artifactId>
-			<version>5.0.0</version>
-		</dependency>
-		<dependency>
 			<groupId>com.github.cowwoc.token-bucket</groupId>
 			<artifactId>token-bucket</artifactId>
 			<version>6.1</version>
@@ -49,7 +34,7 @@
 		<dependency>
 			<groupId>org.simplejavamail</groupId>
 			<artifactId>simple-java-mail</artifactId>
-			<version>8.6.2</version>
+			<version>8.6.3</version>
 		</dependency>
 	</dependencies>
 

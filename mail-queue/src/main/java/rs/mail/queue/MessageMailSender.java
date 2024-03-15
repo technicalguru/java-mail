@@ -2,10 +2,10 @@ package rs.mail.queue;
 
 import java.util.Properties;
 
-import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.Session;
-import javax.mail.Transport;
+import jakarta.mail.Authenticator;
+import jakarta.mail.Message;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
 
 /**
  * Sends messages for {@link javax.mail.Message} objects.

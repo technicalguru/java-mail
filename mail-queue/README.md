@@ -17,7 +17,7 @@ Maven Coordinates:
 	<dependency>
 		<groupId>eu.ralph-schuster</groupId>
 		<artifactId>mail-queue</artifactId>
-		<version>1.0.0</version>
+		<version>1.1.0</version>
 	</dependency>
 ```
 
@@ -29,7 +29,7 @@ Javadoc is available from: [javadoc.io](https://www.javadoc.io/doc/eu.ralph-schu
 
 The projects provides two sending implementations: 
 
-- traditional [JavaMail](https://javaee.github.io/javamail/) framework (`javax.mail.Mail`)
+- traditional [JavaMail](https://javaee.github.io/javamail/) framework (`jakarta.mail.Mail`)
 - flexible [Simple Java Mail](https://www.simplejavamail.org/) framework
 
 You can setup your mail queue quite easily:
