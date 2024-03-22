@@ -13,7 +13,7 @@
 	</properties>
 
 	<artifactId>mail</artifactId>
-	<version>1.1.0</version>
+	<version>1.1.1</version>
 	<packaging>pom</packaging>
 
 	<url>https://github.com/technicalguru/java-mail</url>
@@ -24,7 +24,7 @@
 		<connection>scm:git:https://github.com/technicalguru/java-mail.git</connection>
 		<developerConnection>scm:git:https://github.com/technicalguru/java-mail.git</developerConnection>
 		<url>https://github.com/technicalguru/java-mail</url>
-		<tag>mail-1.1.0</tag>
+		<tag>mail-1.1.1</tag>
 	</scm>
 
 	<issueManagement>
@@ -53,7 +53,7 @@
 		<dependency>
 			<groupId>eu.ralph-schuster</groupId>
 			<artifactId>baselib</artifactId>
-			<version>5.0.0</version>
+			<version>5.0.3</version>
 		</dependency>
 	</dependencies>
 	
