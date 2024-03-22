@@ -24,7 +24,7 @@
 		<connection>scm:git:https://github.com/technicalguru/java-mail.git</connection>
 		<developerConnection>scm:git:https://github.com/technicalguru/java-mail.git</developerConnection>
 		<url>https://github.com/technicalguru/java-mail</url>
-		<tag>v1.0.0</tag>
+		<tag>v1.1.2</tag>
 	</scm>
 
 	<issueManagement>

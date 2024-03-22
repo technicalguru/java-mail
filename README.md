@@ -10,7 +10,7 @@ two parts:
 
 ## Latest Version
 
-Latest version is 1.1.1. (Jakarta API). For javax.main.* API please use 1.0.2.
+Latest version is 1.1.2. (Jakarta API). For javax.main.* API please use 1.0.2.
 
 ## Documentation
 
