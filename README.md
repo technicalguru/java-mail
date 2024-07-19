@@ -10,7 +10,9 @@ two parts:
 
 ## Latest Version
 
-Latest version is 1.1.1. (Jakarta API). For javax.main.* API please use 1.0.2.
+Latest version is 1.2.0. 
+
+Java21 is required since v1.2.0. Use v1.0.2 if you still need pre-Jakarta API (javax.main.*).
 
 ## Documentation
 
