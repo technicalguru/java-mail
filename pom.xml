@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>eu.ralph-schuster</groupId>
 		<artifactId>pom-oss</artifactId>
-		<version>21.0.0</version>
+		<version>21.1.1</version>
 	</parent>
 
 	<properties>
@@ -24,7 +24,7 @@
 		<connection>scm:git:https://github.com/technicalguru/java-mail.git</connection>
 		<developerConnection>scm:git:https://github.com/technicalguru/java-mail.git</developerConnection>
 		<url>https://github.com/technicalguru/java-mail</url>
-		<tag>v1.2.0</tag>
+		<tag>v1.2.1</tag>
 	</scm>
 
 	<issueManagement>
@@ -53,7 +53,7 @@
 		<dependency>
 			<groupId>eu.ralph-schuster</groupId>
 			<artifactId>baselib</artifactId>
-			<version>5.2.0</version>
+			<version>5.2.3</version>
 		</dependency>
 	</dependencies>
 	
