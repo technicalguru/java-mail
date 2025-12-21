@@ -10,7 +10,7 @@ two parts:
 
 ## Latest Version
 
-Latest version is 1.2.0. 
+Latest version is 1.2.2. 
 
 Java21 is required since v1.2.0. Use v1.0.2 if you still need pre-Jakarta API (javax.main.*).
 
