@@ -16,7 +16,7 @@ Maven Coordinates:
 	<dependency>
 		<groupId>eu.ralph-schuster</groupId>
 		<artifactId>mail-templates</artifactId>
-		<version>1.1.2</version>
+		<version>1.2.3</version>
 	</dependency>
 ```
 
